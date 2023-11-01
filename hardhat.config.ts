@@ -3,6 +3,7 @@ import "@nomiclabs/hardhat-waffle"
 import "@nomiclabs/hardhat-etherscan"
 import "@nomiclabs/hardhat-ethers"
 import "hardhat-gas-reporter"
+import "hardhat-contract-sizer"
 import "dotenv/config"
 import "solidity-coverage"
 import "hardhat-deploy"
@@ -65,7 +66,7 @@ const config: HardhatUserConfig = {
             accounts: [`${process.env.PRIVATE_KEY}`],
             chainId: 5050,
             //gasPrice: 250000,
-            deploy: ['deploy_titan_goerli']
+            //deploy: ['deploy_titan_goerli']
           },
           titan: {
             url: 'https://rpc.titan.tokamak.network',
@@ -93,6 +94,7 @@ const config: HardhatUserConfig = {
         apiKey: {
             sepolia: ETHERSCAN_API_KEY,
             goerli: ETHERSCAN_API_KEY,
+            titangoerli: ETHERSCAN_API_KEY,
         },
         customChains: [
             {
@@ -135,7 +137,7 @@ const config: HardhatUserConfig = {
                 version: "0.8.8",
             },
             {
-                version: "0.8.21",
+                version: "0.8.19",
             },
         ],
     },
