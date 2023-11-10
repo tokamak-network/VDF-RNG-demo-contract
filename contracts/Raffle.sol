@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
-//import CommitRecover.sol from bicorn-rx node_modules
-import {CommitRecover} from "bicorn-rx/contracts/CommitRecover.sol";
+import {CommitRecover} from "./Bicorn-RX/CommitRecover.sol";
 
 contract Raffle is CommitRecover {
     uint256 public entranceFee;
@@ -16,9 +15,9 @@ contract Raffle is CommitRecover {
         entranceFee = _entranceFee;
     }
 
-    function enterRafByCommit(uint256 _commit) public payable {
+    function enterRafByCommit(uint256 _c) public payable {
         require(msg.value >= entranceFee, "not enough eth");
-        __commit(_commit);
+        _commit(_c);
         balancesAtRound[round] += msg.value;
         emit RaffleEntered(msg.sender, msg.value);
     }
