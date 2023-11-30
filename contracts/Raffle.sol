@@ -2,6 +2,7 @@
 pragma solidity ^0.8.19;
 
 import {CommitRecover} from "./Bicorn-RX/CommitRecover.sol";
+import "./Bicorn-RX/libraries/Pietrzak_VDF.sol";
 
 contract Raffle is CommitRecover {
     uint256 public entranceFee;
@@ -11,19 +12,26 @@ contract Raffle is CommitRecover {
     event RaffleEntered(address indexed _entrant, uint256 _amount);
     event RaffleWinner(address indexed _winner, uint256 _round);
 
-    constructor(uint256 _entranceFee) {
+    function start(
+        uint256 _entranceFee,
+        uint256 _commitDuration,
+        uint256 _commitRevealDuration,
+        uint256 _n,
+        Pietrzak_VDF.VDFClaim[] calldata _proofs
+    ) public {
         entranceFee = _entranceFee;
+        _start(_commitDuration, _commitRevealDuration, _n, _proofs);
     }
 
     function enterRafByCommit(uint256 _c) public payable {
-        require(msg.value >= entranceFee, "not enough eth");
+        require(msg.value == entranceFee, "wrong entrance fee");
         _commit(_c);
         balancesAtRound[round] += msg.value;
         emit RaffleEntered(msg.sender, msg.value);
     }
 
     //
-    function getWinnerAddress(uint256 _round) public {
+    function setWinnerAddress(uint256 _round) public {
         require(valuesAtRound[_round].isCompleted, "round not completed");
         // get the winner address by getting smallest | participantAddress % valuesAtRound[round].n - omega |
         int256 smallest = type(int256).max;

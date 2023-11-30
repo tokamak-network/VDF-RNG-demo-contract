@@ -52,8 +52,8 @@ library Pietrzak_VDF {
                 SingHalvProofOutput(
                     true,
                     true,
-                    powerModN(powerModN(vdfClaim.x, r, vdfClaim.n), vdfClaim.v, vdfClaim.n),
-                    powerModN(powerModN(vdfClaim.v, r, vdfClaim.n), y, vdfClaim.n),
+                    mulmod(powerModN(vdfClaim.x, r, vdfClaim.n), vdfClaim.v, vdfClaim.n),
+                    mulmod(powerModN(vdfClaim.v, r, vdfClaim.n), y, vdfClaim.n),
                     tHalf
                 );
         }
@@ -70,8 +70,9 @@ library Pietrzak_VDF {
                 return false;
             } else {
                 if (!output.calculated) return true;
-                else if (output.x_prime != proofList[i + 1].x) return false;
-                else if (output.y_prime != proofList[i + 1].y) return false;
+                else if (output.x_prime != proofList[i + 1].x) {
+                    return false;
+                } else if (output.y_prime != proofList[i + 1].y) return false;
                 else if (output.T_half != proofList[i + 1].T) return false;
             }
         }

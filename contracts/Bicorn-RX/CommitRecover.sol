@@ -200,7 +200,7 @@ contract CommitRecover {
         uint256 _bStar = valuesAtRound[_round].bStar;
         require(!valuesAtRound[_round].isCompleted, "OmegaAlreadyCompleted");
         require(valuesAtRound[_round].T == proofs[0].T, "TNotMatched");
-        Pietrzak_VDF.verifyRecursiveHalvingProof(proofs);
+        require(Pietrzak_VDF.verifyRecursiveHalvingProof(proofs));
         for (uint256 i = 0; i < valuesAtRound[_round].numOfParticipants; i++) {
             uint256 _c = commitRevealValues[_round][i].c;
             uint256 temp = Pietrzak_VDF.powerModN(
@@ -230,20 +230,21 @@ contract CommitRecover {
      * @notice reset count, commitsString, isHAndBStarSet, stage, startTime, commitDuration, commitRevealDuration, n, g, omega
      * @notice increase round
      */
-    function start(
+    function _start(
         uint256 _commitDuration,
         uint256 _commitRevealDuration,
         uint256 _n,
         Pietrzak_VDF.VDFClaim[] calldata _proofs
-    ) public {
+    ) internal {
         require(_proofs[0].x < _n, "GreaterOrEqualThanN");
 
         require(
             _commitDuration < _commitRevealDuration,
             "CommitRevealDurationLessThanCommitDuration"
         );
+        checkStage();
         require(stage == Stages.Finished, "StageNotFinished");
-        Pietrzak_VDF.verifyRecursiveHalvingProof(_proofs);
+        require(Pietrzak_VDF.verifyRecursiveHalvingProof(_proofs), "not valid proof");
         round += 1;
         stage = Stages.Commit;
         startTime = block.timestamp;
