@@ -13,7 +13,7 @@ const deployRaffle: DeployFunction = async function (hre: HardhatRuntimeEnvironm
     const waitBlockConfirmations = chainId === 31337 ? 1 : VERIFICATION_BLOCK_CONFIRMATIONS
 
     log("----------------------------------------------------")
-    const args: any[] = [10000000000000000n] // 0.01 ETH
+    const args: any[] = [] //[10000000000000000n] // 0.01 ETH
     const Raffle = await deploy("Raffle", {
         from: deployer,
         args: args,
@@ -21,7 +21,7 @@ const deployRaffle: DeployFunction = async function (hre: HardhatRuntimeEnvironm
         //waitConfirmations: waitBlockConfirmations,
         gasLimit: 4000000,
     })
-    
+
     // Verify the deployment
     if (chainId !== 31337 && process.env.ETHERSCAN_API_KEY) {
         log("Verifying...")
