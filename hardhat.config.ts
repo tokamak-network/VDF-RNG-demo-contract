@@ -1,12 +1,13 @@
 import "@typechain/hardhat"
-import "@nomiclabs/hardhat-waffle"
+// import "@nomiclabs/hardhat-waffle"
 import "@nomiclabs/hardhat-etherscan"
 import "@nomiclabs/hardhat-ethers"
 import "hardhat-gas-reporter"
-import "hardhat-contract-sizer"
 import "dotenv/config"
 import "solidity-coverage"
 import "hardhat-deploy"
+import "@nomicfoundation/hardhat-chai-matchers"
+import "hardhat-contract-sizer"
 import { HardhatUserConfig } from "hardhat/config"
 /** @type import('hardhat/config').HardhatUserConfig */
 
@@ -29,9 +30,11 @@ const config: HardhatUserConfig = {
             //   url: MAINNET_RPC_URL
             // }
             chainId: 31337,
+            allowUnlimitedContractSize: true,
         },
         localhost: {
             chainId: 31337,
+            allowUnlimitedContractSize: true,
         },
         sepolia: {
             url: SEPOLIA_RPC_URL,
