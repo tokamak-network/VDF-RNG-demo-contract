@@ -18,7 +18,7 @@ const deployRaffle: DeployFunction = async function (hre: HardhatRuntimeEnvironm
         from: deployer,
         args: args,
         log: true,
-        //waitConfirmations: waitBlockConfirmations,
+        waitConfirmations: waitBlockConfirmations,
         // gasLimit: 4000000,
     })
 
