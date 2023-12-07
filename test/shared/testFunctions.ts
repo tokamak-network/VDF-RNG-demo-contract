@@ -24,7 +24,6 @@ function getLength(value: number): number {
     while (length < value) length += 32
     return length
 }
-
 export const createTestCases = (testcases: any[]) => {
     const result: TestCase[] = []
     testcases.forEach((testcase) => {
@@ -41,7 +40,6 @@ export const createTestCases = (testcases: any[]) => {
                         testcase[4][i][0],
                         getLength(dataLength(toBeHex(testcase[4][i][0]))),
                     ),
-                    neg: false,
                     bitlen: getBitLenth(testcase[4][i][0]),
                 },
                 x: {
@@ -50,7 +48,6 @@ export const createTestCases = (testcases: any[]) => {
                         testcase[4][i][1],
                         getLength(dataLength(toBeHex(testcase[4][i][1]))),
                     ),
-                    neg: false,
                     bitlen: getBitLenth(testcase[4][i][1]),
                 },
                 y: {
@@ -59,7 +56,6 @@ export const createTestCases = (testcases: any[]) => {
                         testcase[4][i][2],
                         getLength(dataLength(toBeHex(testcase[4][i][2]))),
                     ),
-                    neg: false,
                     bitlen: getBitLenth(testcase[4][i][2]),
                 },
                 T: testcase[4][i][3],
@@ -69,7 +65,6 @@ export const createTestCases = (testcases: any[]) => {
                         testcase[4][i][4],
                         getLength(dataLength(toBeHex(testcase[4][i][4]))),
                     ),
-                    neg: false,
                     bitlen: getBitLenth(testcase[4][i][4]),
                 },
             })
@@ -82,7 +77,6 @@ export const createTestCases = (testcases: any[]) => {
                         testcase[9][i][0],
                         getLength(dataLength(toBeHex(testcase[9][i][0]))),
                     ),
-                    neg: false,
                     bitlen: getBitLenth(testcase[9][i][0]),
                 },
                 x: {
@@ -91,7 +85,6 @@ export const createTestCases = (testcases: any[]) => {
                         testcase[9][i][1],
                         getLength(dataLength(toBeHex(testcase[9][i][1]))),
                     ),
-                    neg: false,
                     bitlen: getBitLenth(testcase[9][i][1]),
                 },
                 y: {
@@ -100,7 +93,6 @@ export const createTestCases = (testcases: any[]) => {
                         testcase[9][i][2],
                         getLength(dataLength(toBeHex(testcase[9][i][2]))),
                     ),
-                    neg: false,
                     bitlen: getBitLenth(testcase[9][i][2]),
                 },
                 T: testcase[9][i][3],
@@ -110,7 +102,6 @@ export const createTestCases = (testcases: any[]) => {
                         testcase[9][i][4],
                         getLength(dataLength(toBeHex(testcase[9][i][4]))),
                     ),
-                    neg: false,
                     bitlen: getBitLenth(testcase[9][i][4]),
                 },
             })
@@ -119,7 +110,6 @@ export const createTestCases = (testcases: any[]) => {
             randomList.push({
                 //val: toBeHex(testcase[5][i]),
                 val: toBeHex(testcase[5][i], getLength(dataLength(toBeHex(testcase[5][i])))),
-                neg: false,
                 bitlen: getBitLenth(testcase[5][i]),
             })
         }
@@ -128,7 +118,6 @@ export const createTestCases = (testcases: any[]) => {
             commitList.push({
                 //val: toBeHex(testcase[6][i]),
                 val: toBeHex(testcase[6][i], getLength(dataLength(toBeHex(testcase[6][i])))),
-                neg: false,
                 bitlen: getBitLenth(testcase[6][i]),
             })
         }
@@ -136,19 +125,16 @@ export const createTestCases = (testcases: any[]) => {
             //n: { val: toBeHex(testcase[0]), neg: false, bitlen: getBitLenth(testcase[0]) },
             n: {
                 val: toBeHex(testcase[0], getLength(dataLength(toBeHex(testcase[0])))),
-                neg: false,
                 bitlen: getBitLenth(testcase[0]),
             },
             //g: { val: toBeHex(testcase[1]), neg: false, bitlen: getBitLenth(testcase[1]) },
             g: {
                 val: toBeHex(testcase[1], getLength(dataLength(toBeHex(testcase[1])))),
-                neg: false,
                 bitlen: getBitLenth(testcase[1]),
             },
             //h: { val: toBeHex(testcase[2]), neg: false, bitlen: getBitLenth(testcase[2]) },
             h: {
                 val: toBeHex(testcase[2], getLength(dataLength(toBeHex(testcase[2])))),
-                neg: false,
                 bitlen: getBitLenth(testcase[2]),
             },
             T: testcase[3],
@@ -158,13 +144,11 @@ export const createTestCases = (testcases: any[]) => {
             //omega: { val: toBeHex(testcase[7]), neg: false, bitlen: getBitLenth(testcase[7]) },
             omega: {
                 val: toBeHex(testcase[7], getLength(dataLength(toBeHex(testcase[7])))),
-                neg: false,
                 bitlen: getBitLenth(testcase[7]),
             },
             recoveredOmega: {
                 //val: toBeHex(testcase[8]),
                 val: toBeHex(testcase[8], getLength(dataLength(toBeHex(testcase[8])))),
-                neg: false,
                 bitlen: getBitLenth(testcase[8]),
             },
             recoveryProofs: recoveryProofs,
@@ -173,20 +157,155 @@ export const createTestCases = (testcases: any[]) => {
     return result
 }
 
+// export const createTestCases2 = (testcases: any[]) => {
+//     const result: TestCase[] = []
+//     testcases.forEach((testcase) => {
+//         let ts: TestCase
+//         let setUpProofs: VDFClaim[] = []
+//         let recoveryProofs: VDFClaim[] = []
+//         let randomList: BigNumber[] = []
+//         let commitList: BigNumber[] = []
+//         for (let i = 0; i < (testcase[4] as []).length; i++) {
+//             setUpProofs.push({
+//                 n: {
+//                     //val: toBeHex(testcase[4][i][0]),
+//                     val: toBeHex(
+//                         testcase[4][i][0],
+//                         getLength(dataLength(toBeHex(testcase[4][i][0]))),
+//                     ),
+//                     neg: false,
+//                     bitlen: getBitLenth(testcase[4][i][0]),
+//                 },
+//                 x: {
+//                     //val: toBeHex(testcase[4][i][1]),
+//                     val: toBeHex(
+//                         testcase[4][i][1],
+//                         getLength(dataLength(toBeHex(testcase[4][i][1]))),
+//                     ),
+//                     neg: false,
+//                     bitlen: getBitLenth(testcase[4][i][1]),
+//                 },
+//                 y: {
+//                     //val: toBeHex(testcase[4][i][2]),
+//                     val: toBeHex(
+//                         testcase[4][i][2],
+//                         getLength(dataLength(toBeHex(testcase[4][i][2]))),
+//                     ),
+//                     neg: false,
+//                     bitlen: getBitLenth(testcase[4][i][2]),
+//                 },
+//                 T: testcase[4][i][3],
+//                 v: {
+//                     //val: toBeHex(testcase[4][i][4]),
+//                     val: toBeHex(
+//                         testcase[4][i][4],
+//                         getLength(dataLength(toBeHex(testcase[4][i][4]))),
+//                     ),
+//                     neg: false,
+//                     bitlen: getBitLenth(testcase[4][i][4]),
+//                 },
+//             })
+//         }
+//         for (let i = 0; i < (testcase[9] as []).length; i++) {
+//             recoveryProofs.push({
+//                 n: {
+//                     //val: toBeHex(testcase[9][i][0]),
+//                     val: toBeHex(
+//                         testcase[9][i][0],
+//                         getLength(dataLength(toBeHex(testcase[9][i][0]))),
+//                     ),
+//                     neg: false,
+//                     bitlen: getBitLenth(testcase[9][i][0]),
+//                 },
+//                 x: {
+//                     //val: toBeHex(testcase[9][i][1]),
+//                     val: toBeHex(
+//                         testcase[9][i][1],
+//                         getLength(dataLength(toBeHex(testcase[9][i][1]))),
+//                     ),
+//                     neg: false,
+//                     bitlen: getBitLenth(testcase[9][i][1]),
+//                 },
+//                 y: {
+//                     //val: toBeHex(testcase[9][i][2]),
+//                     val: toBeHex(
+//                         testcase[9][i][2],
+//                         getLength(dataLength(toBeHex(testcase[9][i][2]))),
+//                     ),
+//                     neg: false,
+//                     bitlen: getBitLenth(testcase[9][i][2]),
+//                 },
+//                 T: testcase[9][i][3],
+//                 v: {
+//                     //val: toBeHex(testcase[9][i][4]),
+//                     val: toBeHex(
+//                         testcase[9][i][4],
+//                         getLength(dataLength(toBeHex(testcase[9][i][4]))),
+//                     ),
+//                     neg: false,
+//                     bitlen: getBitLenth(testcase[9][i][4]),
+//                 },
+//             })
+//         }
+//         for (let i = 0; i < (testcase[5] as []).length; i++) {
+//             randomList.push({
+//                 //val: toBeHex(testcase[5][i]),
+//                 val: toBeHex(testcase[5][i], getLength(dataLength(toBeHex(testcase[5][i])))),
+//                 neg: false,
+//                 bitlen: getBitLenth(testcase[5][i]),
+//             })
+//         }
+//         for (let i = 0; i < (testcase[6] as []).length; i++) {
+//             //commitList.push(testcase[6][i])
+//             commitList.push({
+//                 //val: toBeHex(testcase[6][i]),
+//                 val: toBeHex(testcase[6][i], getLength(dataLength(toBeHex(testcase[6][i])))),
+//                 neg: false,
+//                 bitlen: getBitLenth(testcase[6][i]),
+//             })
+//         }
+//         result.push({
+//             //n: { val: toBeHex(testcase[0]), neg: false, bitlen: getBitLenth(testcase[0]) },
+//             n: {
+//                 val: toBeHex(testcase[0], getLength(dataLength(toBeHex(testcase[0])))),
+//                 neg: false,
+//                 bitlen: getBitLenth(testcase[0]),
+//             },
+//             //g: { val: toBeHex(testcase[1]), neg: false, bitlen: getBitLenth(testcase[1]) },
+//             g: {
+//                 val: toBeHex(testcase[1], getLength(dataLength(toBeHex(testcase[1])))),
+//                 neg: false,
+//                 bitlen: getBitLenth(testcase[1]),
+//             },
+//             //h: { val: toBeHex(testcase[2]), neg: false, bitlen: getBitLenth(testcase[2]) },
+//             h: {
+//                 val: toBeHex(testcase[2], getLength(dataLength(toBeHex(testcase[2])))),
+//                 neg: false,
+//                 bitlen: getBitLenth(testcase[2]),
+//             },
+//             T: testcase[3],
+//             setupProofs: setUpProofs,
+//             randomList: randomList,
+//             commitList: commitList,
+//             //omega: { val: toBeHex(testcase[7]), neg: false, bitlen: getBitLenth(testcase[7]) },
+//             omega: {
+//                 val: toBeHex(testcase[7], getLength(dataLength(toBeHex(testcase[7])))),
+//                 neg: false,
+//                 bitlen: getBitLenth(testcase[7]),
+//             },
+//             recoveredOmega: {
+//                 //val: toBeHex(testcase[8]),
+//                 val: toBeHex(testcase[8], getLength(dataLength(toBeHex(testcase[8])))),
+//                 neg: false,
+//                 bitlen: getBitLenth(testcase[8]),
+//             },
+//             recoveryProofs: recoveryProofs,
+//         })
+//     })
+//     return result
+// }
 export const deployAndStartRaffleContract = async (params: any) => {
-    let raffle = await ethers.deployContract("Raffle", [])
-    raffle = await raffle.waitForDeployment()
-    const tx = raffle.deploymentTransaction()
-    let receipt = await tx?.wait()
-    console.log("deploy gas used: ", receipt?.gasUsed?.toString())
-    const startTx = await raffle.start(...params)
-    receipt = await startTx.wait()
-    console.log("start gas used: ", receipt?.gasUsed?.toString())
-    return { raffle, receipt }
-}
-
-export const deployAndStartCommitRevealContract = async (params: any) => {
-    let commitRecover = await ethers.deployContract("CommitRecover", [])
+    let commitRecover = await ethers.deployContract("Raffle", [])
     commitRecover = await commitRecover.waitForDeployment()
     const tx = commitRecover.deploymentTransaction()
     let receipt = await tx?.wait()
@@ -207,86 +326,40 @@ export const deployFirstTestCaseRaffleContract = async () => {
         testcases[testcaseNum].n,
         testcases[testcaseNum].setupProofs,
     ]
-    const { raffle, receipt } = await deployAndStartRaffleContract(params)
+    const { commitRecover, receipt } = await deployAndStartRaffleContract(params)
     //get states
-    const {
-        stage,
-        commitStartTime,
-        commitDuration,
-        commitRevealDuration,
-        n,
-        g,
-        h,
-        T,
-        round,
-        deployedEvent,
-        deployedBlockNum,
-        deployedTimestamp,
-    } = await getStatesAfterDeployment(raffle, receipt as ContractTransactionReceipt)
-    //return states
-    return {
-        raffle,
-        receipt,
-        testcases,
-        params,
-        stage,
-        commitStartTime,
-        commitDuration,
-        commitRevealDuration,
-        n,
-        g,
-        h,
-        T,
-        round,
-        deployedEvent,
-        deployedBlockNum,
-        deployedTimestamp,
-    }
-}
-
-export const deployFirstTestCaseCommitRevealContract = async () => {
-    const testcases = createTestCases(testCases3)
-    const testcaseNum = 0
-    let params = [
-        networkConfig[network.config.chainId!].commitDuration,
-        networkConfig[network.config.chainId!].commitRevealDuration,
-        testcases[testcaseNum].n,
-        testcases[testcaseNum].setupProofs,
-    ]
-    const { commitRecover, receipt } = await deployAndStartCommitRevealContract(params)
-    //get states
-    const {
-        stage,
-        commitStartTime,
-        commitDuration,
-        commitRevealDuration,
-        n,
-        g,
-        h,
-        T,
-        round,
-        deployedEvent,
-        deployedBlockNum,
-        deployedTimestamp,
-    } = await getStatesAfterDeployment(commitRecover, receipt as ContractTransactionReceipt)
+    // const {
+    //     stage,
+    //     commitStartTime,
+    //     commitDuration,
+    //     commitRevealDuration,
+    //     n,
+    //     g,
+    //     h,
+    //     T,
+    //     round,
+    //     deployedEvent,
+    //     deployedBlockNum,
+    //     deployedTimestamp,
+    // } = await getStatesAfterDeployment(commitRecover, receipt as ContractTransactionReceipt)
     //return states
     return {
         commitRecover,
         receipt,
         testcases,
         params,
-        stage,
-        commitStartTime,
-        commitDuration,
-        commitRevealDuration,
-        n,
-        g,
-        h,
-        T,
-        round,
-        deployedEvent,
-        deployedBlockNum,
-        deployedTimestamp,
+        // stage,
+        // commitStartTime,
+        // commitDuration,
+        // commitRevealDuration,
+        // n,
+        // g,
+        // h,
+        // T,
+        // round,
+        // deployedEvent,
+        // deployedBlockNum,
+        // deployedTimestamp,
     }
 }
 
@@ -405,22 +478,13 @@ export const commit = async (
     i: number,
     round: number,
 ) => {
-    const tx = await (commitRecoverContract.connect(signer) as Contract).commit(commit)
-    const receipt = await tx.wait()
-    console.log(receipt.gasUsed.toString())
-    await commitCheck(commitRecoverContract, receipt, commit, signer, i, round)
-}
-
-export const enterRafByCommit = async (
-    commitRecoverContract: Contract,
-    signer: SignerWithAddress,
-    commit: BigNumber,
-    i: number,
-    round: number,
-) => {
-    const tx = await (commitRecoverContract.connect(signer) as Contract).enterRafByCommit(commit, {
-        value: ethers.parseEther("0.01"),
-    })
+    const tx = await (commitRecoverContract.connect(signer) as Contract).enterRafByCommit(
+        round,
+        commit,
+        {
+            value: ethers.parseEther("0.01"),
+        },
+    )
     const receipt = await tx.wait()
     console.log(receipt.gasUsed.toString())
     await commitCheck(commitRecoverContract, receipt, commit, signer, i, round)
@@ -433,7 +497,7 @@ export const reveal = async (
     i: number,
     round: number,
 ) => {
-    const tx = await (commitRecoverContract.connect(signer) as Contract).reveal(random)
+    const tx = await (commitRecoverContract.connect(signer) as Contract).reveal(round, random)
     const receipt = await tx.wait()
     await revealCheck(commitRecoverContract, receipt, random, signer, i, round)
 }
@@ -490,17 +554,17 @@ export const revealCheck = async (
 ) => {
     const ii = ethers.toBigInt(i)
     //get states
-    const {
-        count,
-        stage,
-        commitsString,
-        round,
-        valuesAtRound,
-        userInfosAtRound,
-        commitRevealValue,
-    } = await getStatesAfterCommitOrReveal(commitRevealContract, receipt, signer, i)
+    // const {
+    //     count,
+    //     stage,
+    //     commitsString,
+    //     round,
+    //     valuesAtRound,
+    //     userInfosAtRound,
+    //     commitRevealValue,
+    // } = await getStatesAfterCommitOrReveal(commitRevealContract, receipt, signer, i)
     //console.log("valuesAtRoundvaluesAtRound, ", valuesAtRound)
-    const { omega, bStar, numOfParticipants, isCompleted } = valuesAtRound
+    //const { omega, bStar, numOfParticipants, isCompleted } = valuesAtRound
 }
 
 let commitsStringTest: string
@@ -515,26 +579,26 @@ export const commitCheck = async (
     //if (i == 0) commitsStringTest = ""
     const ii = ethers.toBigInt(i)
     //get states
-    const {
-        count,
-        stage,
-        commitsString,
-        round,
-        valuesAtRound,
-        userInfosAtRound,
-        commitRevealValue,
-    } = await getStatesAfterCommitOrReveal(commitRevealContract, receipt, signer, i)
-    //assert.equal(ii + BigInt(1), count, "count should be equal to i")
-    assert.equal(stage, 0, "stage should be 0")
-    assert.equal(round, 1, "round should be 1")
-    // commitsStringTest += commit.toString()
-    // assert.equal(
-    //     commitsStringTest,
+    // const {
+    //     count,
+    //     stage,
     //     commitsString,
-    //     "commitsString should be equal to commitsStringTest",
-    // )
-    assert.equal(roundTest, round, "round should be equal to roundTest")
-    const { omega, bStar, numOfParticipants, isCompleted } = valuesAtRound
+    //     round,
+    //     valuesAtRound,
+    //     userInfosAtRound,
+    //     commitRevealValue,
+    // } = await getStatesAfterCommitOrReveal(commitRevealContract, receipt, signer, i)
+    //assert.equal(ii + BigInt(1), count, "count should be equal to i")
+    // assert.equal(stage, 0, "stage should be 0")
+    // assert.equal(round, 1, "round should be 1")
+    // // commitsStringTest += commit.toString()
+    // // assert.equal(
+    // //     commitsStringTest,
+    // //     commitsString,
+    // //     "commitsString should be equal to commitsStringTest",
+    // // )
+    // assert.equal(roundTest, round, "round should be equal to roundTest")
+    // const { omega, bStar, numOfParticipants, isCompleted } = valuesAtRound
     // assert.equal(omega, 0, "omega should be 0")
     // assert.equal(bStar, 0, "bStar should be 0")
     // assert.equal(numOfParticipants, 0, "numOfParticipants should be 0")

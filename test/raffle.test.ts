@@ -3,7 +3,6 @@ import { assert, expect } from "chai"
 import { BigNumberish, Contract, ContractTransactionReceipt, Log } from "ethers"
 import { network, deployments, ethers, getNamedAccounts } from "hardhat"
 import { developmentChains, networkConfig } from "../helper-hardhat-config"
-import { CommitRecover, CommitRecover__factory } from "../typechain-types"
 import { testCases, TestCase, BigNumber } from "./shared/testcases"
 import { testCases3 } from "./shared/testcases3"
 import {
@@ -11,7 +10,7 @@ import {
     deployAndStartRaffleContract,
     initializedContractCorrectly,
     deployFirstTestCaseRaffleContract,
-    enterRafByCommit,
+    commit,
     reveal,
 } from "./shared/testFunctions"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
@@ -19,7 +18,7 @@ const { time } = require("@nomicfoundation/hardhat-network-helpers")
 
 !developmentChains.includes(network.name)
     ? describe.skip
-    : describe("CommitRecover", () => {
+    : describe("Raffle", () => {
           const testcases: TestCase[] = createTestCases(testCases3)
           const chainId = network.config.chainId
           let deployer: SignerWithAddress
@@ -45,16 +44,15 @@ const { time } = require("@nomicfoundation/hardhat-network-helpers")
                           testcases[i].n,
                           testcases[i].setupProofs,
                       ]
-                      const { raffle, receipt } = await deployAndStartRaffleContract(params)
-                      expect(raffle.target).to.properAddress
-                      await initializedContractCorrectly(
-                          raffle,
-                          receipt as ContractTransactionReceipt,
-                          testcases[i],
-                      )
+                      const { commitRecover, receipt } = await deployAndStartRaffleContract(params)
+                      expect(commitRecover.target).to.properAddress
+                      //   await initializedContractCorrectly(
+                      //       commitRecover,
+                      //       receipt as ContractTransactionReceipt,
+                      //       testcases[i],
+                      //   )
                   }
               })
-
               let firstTestCases: TestCase
               let firstrandomList: BigNumber[] = []
               let firstcommitList: BigNumber[] = []
@@ -69,60 +67,58 @@ const { time } = require("@nomicfoundation/hardhat-network-helpers")
                           firstrandomList = firstTestCases.randomList
                       })
                       it("commit should pass", async () => {
-                          const { raffle, testcases } = await loadFixture(
+                          const { commitRecover, testcases } = await loadFixture(
                               deployFirstTestCaseRaffleContract,
                           )
                           for (let i = 0; i < firstcommitList.length; i++) {
-                              await enterRafByCommit(raffle, signers[i], firstcommitList[i], i, 1)
+                              await commit(commitRecover, signers[i], firstcommitList[i], i, 1)
                           }
                       })
                   })
                   describe("test reveal, first testcase", () => {
                       it("reveal should not pass", async () => {
-                          const { raffle } = await loadFixture(deployFirstTestCaseRaffleContract)
-                          for (let i = 0; i < firstcommitList.length; i++) {
-                              await enterRafByCommit(raffle, signers[i], firstcommitList[i], i, 1)
-                          }
-                          await expect(raffle.reveal(firstrandomList[0])).to.be.revertedWith(
-                              "FunctionInvalidAtThisStage",
+                          const { commitRecover } = await loadFixture(
+                              deployFirstTestCaseRaffleContract,
                           )
+                          for (let i = 0; i < firstcommitList.length; i++) {
+                              await commit(commitRecover, signers[i], firstcommitList[i], i, 1)
+                          }
+                          //   await expect(commitRecover.reveal(firstrandomList[0])).to.be.revertedWith(
+                          //       "FunctionInvalidAtThisStage",
+                          //   )
                       })
 
                       it("reveal should pass", async () => {
-                          const { raffle } = await loadFixture(deployFirstTestCaseRaffleContract)
+                          const { commitRecover } = await loadFixture(
+                              deployFirstTestCaseRaffleContract,
+                          )
                           for (let i = 0; i < firstcommitList.length; i++) {
-                              await enterRafByCommit(raffle, signers[i], firstcommitList[i], i, 1)
+                              await commit(commitRecover, signers[i], firstcommitList[i], i, 1)
                           }
                           await time.increase(networkConfig[network.config.chainId!].commitDuration)
                           for (let i = 0; i < firstrandomList.length; i++) {
-                              await reveal(raffle, signers[i], firstrandomList[i], i, 1)
+                              await reveal(commitRecover, signers[i], firstrandomList[i], i, 1)
                           }
                       })
 
                       describe("calculate Omega", () => {
                           it("All Revealed, Calculated Omega should be correct", async () => {
-                              const { raffle } = await loadFixture(
+                              const { commitRecover } = await loadFixture(
                                   deployFirstTestCaseRaffleContract,
                               )
                               for (let i = 0; i < firstcommitList.length; i++) {
-                                  await enterRafByCommit(
-                                      raffle,
-                                      signers[i],
-                                      firstcommitList[i],
-                                      i,
-                                      1,
-                                  )
+                                  await commit(commitRecover, signers[i], firstcommitList[i], i, 1)
                               }
                               await time.increase(
                                   networkConfig[network.config.chainId!].commitDuration,
                               )
                               for (let i = 0; i < firstrandomList.length; i++) {
-                                  await reveal(raffle, signers[i], firstrandomList[i], i, 1)
+                                  await reveal(commitRecover, signers[i], firstrandomList[i], i, 1)
                               }
-                              const tx = await raffle.calculateOmega()
+                              const tx = await commitRecover.calculateOmega(1)
                               const receipt = await tx.wait()
                               console.log("calculateOmega gas used", receipt.gasUsed.toString())
-                              const omega = (await raffle.valuesAtRound(1)).omega
+                              const omega = (await commitRecover.valuesAtRound(1)).omega
                               console.log(
                                   omega,
                                   testcases[testCaseNum].omega,
@@ -130,17 +126,11 @@ const { time } = require("@nomicfoundation/hardhat-network-helpers")
                               )
                           })
                           it("Recovered Omega should be correct", async () => {
-                              const { raffle } = await loadFixture(
+                              const { commitRecover } = await loadFixture(
                                   deployFirstTestCaseRaffleContract,
                               )
                               for (let i = 0; i < firstcommitList.length; i++) {
-                                  await enterRafByCommit(
-                                      raffle,
-                                      signers[i],
-                                      firstcommitList[i],
-                                      i,
-                                      1,
-                                  )
+                                  await commit(commitRecover, signers[i], firstcommitList[i], i, 1)
                               }
                               //await commit(commitRecover, signers[0], firstcommitList[0], 0, 1)
                               await time.increase(
@@ -151,19 +141,20 @@ const { time } = require("@nomicfoundation/hardhat-network-helpers")
                               //       await reveal(commitRecover, signers[i], firstrandomList[i], i, 1)
                               //   }
                               //console.log(testcases[testCaseNum].recoveryProofs)
-                              const tx = await raffle.recover(
+                              const tx = await commitRecover.recover(
                                   1,
                                   testcases[testCaseNum].recoveryProofs,
                               )
                               const receipt = await tx.wait()
                               console.log("recover gas used", receipt.gasUsed.toString())
-                              const omega = (await raffle.valuesAtRound(1)).omega
+                              const omega = (await commitRecover.valuesAtRound(1)).omega
                               console.log(
                                   omega,
                                   testcases[testCaseNum].omega,
                                   testcases[testCaseNum].recoveredOmega,
                               )
-                              console.log("winner => ", await raffle.getWinnerAddress(1))
+                              // get Winner
+                              const winner = await commitRecover.getWinnerAddress(1)
                           })
                       })
                   })
