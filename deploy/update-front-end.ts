@@ -14,13 +14,13 @@
 import { ethers } from "hardhat"
 import fs from "fs"
 import { network } from "hardhat"
-const FRONT_END_ADDRESS_FILE = "../../demo-front2/constants/contractAddress.json"
-const FRONT_END_ABI_FILE = "../../demo-front2/constants/abi.json"
+const FRONT_END_ADDRESS_FILE = __dirname + "/../../../demo-front2/constants/contractAddress.json"
+const FRONT_END_ABI_FILE = __dirname + "/../../../demo-front2/constants/abi.json"
 export default async function deployRaffle() {
     if (process.env.UPDATE_FRONT_END) {
         console.log("Updating front end...")
-        updateContractAddress()
-        updateAbi()
+        await updateContractAddress()
+        await updateAbi()
     }
 }
 async function updateAbi() {
