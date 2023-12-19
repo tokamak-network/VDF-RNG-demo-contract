@@ -107,6 +107,7 @@ contract CommitRecover {
     error StageNotFinished();
     error CommitRevealDurationLessThanCommitDuration();
     error AllFinished();
+    error NoneParticipated();
 
     /* Functions */
     /**
@@ -206,7 +207,11 @@ contract CommitRecover {
         BigNumber memory recov = BigNumbers.one();
         BigNumber memory _n = setUpValuesAtRound[_round].n;
         checkStage(_round);
-        if (valuesAtRound[_round].stage <= Stages.Commit) revert FunctionInvalidAtThisStage();
+        if (valuesAtRound[_round].stage == Stages.Commit) revert FunctionInvalidAtThisStage();
+        if (
+            valuesAtRound[_round].stage == Stages.Finished &&
+            valuesAtRound[_round].numOfParticipants == 0
+        ) revert NoneParticipated();
         bytes memory _bStar = valuesAtRound[_round].bStar;
         if (valuesAtRound[_round].isCompleted) revert OmegaAlreadyCompleted();
         if (setUpValuesAtRound[_round].T != proofs[0].T) revert TNotMatched();
@@ -239,7 +244,7 @@ contract CommitRecover {
         Pietrzak_VDF.VDFClaim[] calldata _proofs
     ) internal returns (uint256 _round) {
         _round = mostRecentRound++;
-        if (valuesAtRound[_round].stage != Stages.Finished) revert StageNotFinished();
+        //if (valuesAtRound[_round].stage != Stages.Finished) revert StageNotFinished();
         if (_commitDuration >= _commitRevealDuration)
             revert CommitRevealDurationLessThanCommitDuration();
         if (!Pietrzak_VDF.verifyRecursiveHalvingProof(_proofs, _n)) revert NotVerified();

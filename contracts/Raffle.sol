@@ -10,9 +10,12 @@ contract Raffle is CommitRecover {
     mapping(uint256 round => address winnerAddress) public winnerAddresses;
     mapping(uint256 round => uint256 balance) public balancesAtRound;
     mapping(uint256 round => uint256 entranceFee) public entranceFeesAtRound;
+    mapping(address participantAddress => uint256[] rounds) private participatedRounds;
+    uint256 public raffleRound;
 
     event RaffleEntered(address indexed _entrant, uint256 _amount);
     event RaffleWinner(address indexed _winner, uint256 _round);
+    error EntranceFeeZero();
 
     function setUp(
         uint256 _entranceFee,
@@ -21,14 +24,20 @@ contract Raffle is CommitRecover {
         BigNumber calldata _n,
         Pietrzak_VDF.VDFClaim[] calldata _proofs
     ) public {
+        checkStage(raffleRound);
+        if (valuesAtRound[raffleRound].stage != Stages.Finished) revert StageNotFinished();
+        if (_entranceFee == 0) revert EntranceFeeZero();
         uint256 _round = _setUp(_commitDuration, _commitRevealDuration, _n, _proofs);
         entranceFeesAtRound[_round] = _entranceFee;
+        raffleRound = _round;
     }
 
-    function enterRafByCommit(uint256 _round, BigNumber memory _c) public payable {
+    function enterRafByCommit(BigNumber memory _c) public payable {
+        uint256 _round = raffleRound;
         require(msg.value == entranceFeesAtRound[_round], "wrong entrance fee");
         _commit(_round, _c);
         balancesAtRound[_round] += msg.value;
+        participatedRounds[msg.sender].push(_round);
         emit RaffleEntered(msg.sender, msg.value);
     }
 
@@ -59,7 +68,13 @@ contract Raffle is CommitRecover {
 
     function withdraw(uint256 _round) public {
         address _winnerAddress = getWinnerAddress(_round);
+        require(winnerAddresses[_round] == address(0), "winner already withdrawn");
         require(_winnerAddress == msg.sender, "not winner");
+        winnerAddresses[_round] = _winnerAddress;
         payable(msg.sender).transfer(balancesAtRound[_round]);
+    }
+
+    function getParticipatedRounds() public view returns (uint256[] memory) {
+        return participatedRounds[msg.sender];
     }
 }
