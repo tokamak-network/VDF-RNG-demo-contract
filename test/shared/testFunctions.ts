@@ -306,11 +306,9 @@ export const commit = async (
     signer: SignerWithAddress,
     params: CommitParams,
 ) => {
-    const tx = await (raffleContract.connect(signer) as Contract).enterRafByCommit(
-        params.round,
-        params.commit,
-        { value: ethers.parseEther("0.1") },
-    )
+    const tx = await (raffleContract.connect(signer) as Contract).enterRafByCommit(params.commit, {
+        value: ethers.parseEther("0.1"),
+    })
     const receipt = await tx.wait()
     return { raffleContract, receipt }
 }
