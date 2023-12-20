@@ -24,6 +24,50 @@ import { testCases } from "./testcases"
 import { developmentChains, networkConfig } from "../../helper-hardhat-config"
 import fs from "fs"
 
+export const getRankPointOfEachParticipants = async (
+    raffleContract: Contract,
+    round: number,
+): Promise<{ addresses: string[]; rankPoints: bigint[] }> => {
+    let addresses: string[] = []
+    let rankPoints: bigint[] = []
+    let valuesAtRound: any = await raffleContract.valuesAtRound(round)
+    for (let i = 0; i < valuesAtRound.numOfParticipants; i++) {
+        let commitRevealValues: any = await raffleContract.commitRevealValues(round, i)
+        let address: string = commitRevealValues.participantAddress
+        addresses.push(address)
+        let a: bigint = BigInt(ethers.keccak256(commitRevealValues.c.val))
+        let b: bigint = BigInt(ethers.keccak256(address))
+        let c: bigint = a - b
+        rankPoints.push(c < 0n ? -c : c)
+    }
+    return { addresses, rankPoints }
+}
+
+export const getWinnerAddress = async (raffleContract: Contract, round: number) => {
+    let winnerIndex: number = 0
+    let setUpValuesAtRound: any = await raffleContract.setUpValuesAtRound(round)
+    let valuesAtRound: any = await raffleContract.valuesAtRound(round)
+    let _n: bigint = setUpValuesAtRound.n.val
+    let smallest = _n + 1n
+    let _omega: bigint = valuesAtRound.omega.val
+    let numOfParticipants: number = valuesAtRound.numOfParticipants
+
+    for (let i = 0; i < numOfParticipants; i++) {
+        let participantAddress: bigint = await raffleContract
+            .commitRevealValues(round, i)
+            .then((x) => BigInt(x.participantAddress))
+        let _value: bigint = BigInt(BigInt(participantAddress) % BigInt(_n)) - BigInt(_omega)
+        _value = _value < 0n ? -_value : _value
+        if (_value < smallest) {
+            smallest = _value
+            winnerIndex = i
+        }
+    }
+    return await raffleContract
+        .commitRevealValues(round, winnerIndex)
+        .then((x) => x.participantAddress)
+}
+
 export const createTestCases2 = () => {
     const result: TestCase[] = []
     const testData: TestCaseJson = JSON.parse(
