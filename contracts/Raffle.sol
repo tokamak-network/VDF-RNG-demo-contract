@@ -41,6 +41,21 @@ contract Raffle is CommitRecover {
         emit RaffleEntered(msg.sender, msg.value);
     }
 
+    function getRankPointOfEachParticipants(
+        uint256 _round
+    ) public view returns (address[] memory addresses, bytes[] memory rankPoints) {
+        require(valuesAtRound[_round].isCompleted, "round not completed");
+        addresses = new address[](valuesAtRound[_round].numOfParticipants);
+        rankPoints = new bytes[](valuesAtRound[_round].numOfParticipants);
+        for (uint256 i = 0; i < valuesAtRound[_round].numOfParticipants; i++) {
+            address _address = commitRevealValues[_round][i].participantAddress;
+            addresses[i] = _address;
+            bytes memory a = abi.encodePacked(keccak256(commitRevealValues[_round][i].c.val));
+            bytes memory b = abi.encodePacked(keccak256(abi.encodePacked(_address)));
+            rankPoints[i] = a.init().sub(b.init()).val;
+        }
+    }
+
     function getWinnerAddress(uint256 _round) public view returns (address) {
         require(valuesAtRound[_round].isCompleted, "round not completed");
         // get the winner address by getting smallest | participantAddress % valuesAtRound[round].n - omega |
