@@ -30,12 +30,14 @@ export const getRankPointOfEachParticipants = async (
 ): Promise<{ addresses: string[]; rankPoints: bigint[] }> => {
     let addresses: string[] = []
     let rankPoints: bigint[] = []
+    let a: bigint = BigInt(
+        ethers.keccak256(await raffleContract.valuesAtRound(round).then((x) => x.omega.val)),
+    )
     let valuesAtRound: any = await raffleContract.valuesAtRound(round)
     for (let i = 0; i < valuesAtRound.numOfParticipants; i++) {
         let commitRevealValues: any = await raffleContract.commitRevealValues(round, i)
         let address: string = commitRevealValues.participantAddress
         addresses.push(address)
-        let a: bigint = BigInt(ethers.keccak256(commitRevealValues.c.val))
         let b: bigint = BigInt(ethers.keccak256(address))
         let c: bigint = a - b
         rankPoints.push(c < 0n ? -c : c)
@@ -335,7 +337,6 @@ export const deployRaffle = async () => {
 
 export const setUpRaffleRound = async (raffleContract: Contract, params: SetUpParams) => {
     const setUpTx = await raffleContract.setUp(
-        params.entranceFee,
         params.commitDuration,
         params.commitRevealDuration,
         params.n,
@@ -350,9 +351,7 @@ export const commit = async (
     signer: SignerWithAddress,
     params: CommitParams,
 ) => {
-    const tx = await (raffleContract.connect(signer) as Contract).enterRafByCommit(params.commit, {
-        value: ethers.parseEther("0.1"),
-    })
+    const tx = await (raffleContract.connect(signer) as Contract).enterRafByCommit(params.commit)
     const receipt = await tx.wait()
     return { raffleContract, receipt }
 }

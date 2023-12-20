@@ -31,7 +31,6 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
           let deployer: SignerWithAddress
           let commitDuration = networkConfig[chainId!].commitDuration
           let commitRevealDuration = networkConfig[chainId!].commitRevealDuration
-          let entranceFee = ethers.parseEther("0.1")
           let _n: BigNumberish
           before(async () => {
               deployer = await ethers.getSigner((await getNamedAccounts()).deployer)
@@ -55,7 +54,6 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                   for (let i = 0; i < testcases.length; i++) {
                       let { raffleContract, receipt } = await deployRaffle()
                       let params: SetUpParams = {
-                          entranceFee,
                           commitDuration,
                           commitRevealDuration,
                           n: testcases[i].n,
@@ -71,7 +69,6 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                   let { raffleContract, receipt } = await deployRaffle()
                   for (let round = 0; round < testcases.length; round++) {
                       let params: SetUpParams = {
-                          entranceFee,
                           commitDuration,
                           commitRevealDuration,
                           n: testcases[round].n,
@@ -94,7 +91,6 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                   let { raffleContract, receipt } = await deployRaffle()
                   for (let round = 0; round < testcases.length; round++) {
                       let params: SetUpParams = {
-                          entranceFee,
                           commitDuration,
                           commitRevealDuration,
                           n: testcases[round].n,
@@ -125,7 +121,6 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                   let { raffleContract, receipt } = await deployRaffle()
                   for (let round = 0; round < testcases.length; round++) {
                       let params: SetUpParams = {
-                          entranceFee,
                           commitDuration,
                           commitRevealDuration,
                           n: testcases[round].n,
@@ -164,7 +159,6 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                   let { raffleContract, receipt } = await deployRaffle()
                   for (let round = 0; round < testcases.length; round++) {
                       let params: SetUpParams = {
-                          entranceFee,
                           commitDuration,
                           commitRevealDuration,
                           n: testcases[round].n,
@@ -194,12 +188,11 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                   }
               })
           })
-          describe("getWinnerAddress", () => {
-              it("getWinnerAddress result from contract should be equal to typescript function", async () => {
+          describe("getRankofEachPariticipants", () => {
+              it("getRankofEachPariticipants result from contract should be equal to typescript function", async () => {
                   let { raffleContract, receipt } = await deployRaffle()
                   for (let round = 0; round < testcases.length; round++) {
                       let params: SetUpParams = {
-                          entranceFee,
                           commitDuration,
                           commitRevealDuration,
                           n: testcases[round].n,
@@ -226,10 +219,6 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                           testcases[round].omega,
                           testcases[round].recoveredOmega,
                       )
-                      // console getWinnerAddress
-                      const winnerAddress = await raffleContract.getWinnerAddress(round)
-                      console.log("winnerAddress", winnerAddress)
-                      assert.equal(await getWinnerAddress(raffleContract, round), winnerAddress)
 
                       console.log("participatedRound", await raffleContract.getParticipatedRounds())
 
