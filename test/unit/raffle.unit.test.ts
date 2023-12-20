@@ -9,12 +9,14 @@ import { testCases } from "../shared/testcases"
 import {
     createTestCases,
     createTestCases2,
+    getRankPointOfEachParticipants,
     deployRaffle,
     setUpRaffleRound,
     initializedContractCorrectly,
     deployFirstTestCaseRaffleContract,
     commit,
     reveal,
+    getWinnerAddress,
 } from "../shared/testFunctions"
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { time } from "@nomicfoundation/hardhat-network-helpers"
@@ -189,10 +191,64 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                           testcases[round].omega,
                           testcases[round].recoveredOmega,
                       )
-                      console.log(omega)
+                  }
+              })
+          })
+          describe("getWinnerAddress", () => {
+              it("getWinnerAddress result from contract should be equal to typescript function", async () => {
+                  let { raffleContract, receipt } = await deployRaffle()
+                  for (let round = 0; round < testcases.length; round++) {
+                      let params: SetUpParams = {
+                          entranceFee,
+                          commitDuration,
+                          commitRevealDuration,
+                          n: testcases[round].n,
+                          setupProofs: testcases[round].setupProofs,
+                      }
+                      let setUpReceipt = await setUpRaffleRound(raffleContract, params)
+                      signers = await ethers.getSigners()
+                      for (let j = 0; j < testcases[round].commitList.length; j++) {
+                          let commitParams: CommitParams = {
+                              round: round,
+                              commit: testcases[round].commitList[j],
+                          }
+                          await commit(raffleContract, signers[j], commitParams)
+                      }
+                      await time.increase(commitDuration)
+                      const tx = await raffleContract.recover(
+                          round,
+                          testcases[round].recoveryProofs,
+                      )
+                      const receipt = await tx.wait()
+                      const omega = (await raffleContract.valuesAtRound(round)).omega
+                      assertTestAfterGettingOmega(
+                          omega,
+                          testcases[round].omega,
+                          testcases[round].recoveredOmega,
+                      )
                       // console getWinnerAddress
                       const winnerAddress = await raffleContract.getWinnerAddress(round)
                       console.log("winnerAddress", winnerAddress)
+                      assert.equal(await getWinnerAddress(raffleContract, round), winnerAddress)
+
+                      console.log("participatedRound", await raffleContract.getParticipatedRounds())
+
+                      const randPointOfEachParticipants =
+                          await raffleContract.getRankPointOfEachParticipants(round)
+                      let typescriptRusult = await getRankPointOfEachParticipants(
+                          raffleContract,
+                          round,
+                      )
+                      for (let i = 0; i < randPointOfEachParticipants[1].length; i++) {
+                          assert.equal(
+                              randPointOfEachParticipants[0][i],
+                              typescriptRusult.addresses[i],
+                          )
+                          assert.equal(
+                              randPointOfEachParticipants[1][i],
+                              typescriptRusult.rankPoints[i],
+                          )
+                      }
                   }
               })
           })
