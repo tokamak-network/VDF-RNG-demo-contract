@@ -54,7 +54,7 @@ contract CommitRecover {
         bool revealed; // true if revealed
     }
     /* State variables */
-    uint256 public mostRecentRound;
+    uint256 public nextRound;
     mapping(uint256 round => SetUpValueAtRound) public setUpValuesAtRound;
     mapping(uint256 round => ValueAtRound) public valuesAtRound;
     mapping(uint256 round => mapping(uint256 index => CommitRevealValue)) public commitRevealValues;
@@ -243,7 +243,7 @@ contract CommitRecover {
         BigNumber calldata _n,
         Pietrzak_VDF.VDFClaim[] calldata _proofs
     ) internal returns (uint256 _round) {
-        _round = mostRecentRound++;
+        _round = nextRound++;
         //if (valuesAtRound[_round].stage != Stages.Finished) revert StageNotFinished();
         if (_commitDuration >= _commitRevealDuration)
             revert CommitRevealDurationLessThanCommitDuration();
