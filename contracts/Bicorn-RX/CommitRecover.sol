@@ -108,6 +108,7 @@ contract CommitRecover {
     error CommitRevealDurationLessThanCommitDuration();
     error AllFinished();
     error NoneParticipated();
+    error ShouldNotBeZero();
 
     /* Functions */
     /**
@@ -118,6 +119,7 @@ contract CommitRecover {
      * @notice check period, update stage if needed, revert if not currently at commit stage
      */
     function _commit(uint256 _round, BigNumber memory _c) internal {
+        if (_c.isZero()) revert ShouldNotBeZero();
         if (userInfosAtRound[msg.sender][_round].committed) revert AlreadyCommitted();
         checkStage(_round);
         equalStage(_round, Stages.Commit);
