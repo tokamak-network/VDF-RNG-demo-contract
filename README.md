@@ -1,42 +1,65 @@
-# RAFFLE-Bicorn-RX
+# Christmas Gift Event using Commit-Reveal-Recover Random Number Generation(RNG)
 
 Raffle App using Commit Reveal Recover<br>
 
-## INSTALL
+# Getting Started
+## Requirements
+- [git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+  - You'll know you did it right if you can run:
+    - `git --version` and you see a response like `git version x.x.x`
+- [Nodejs](https://nodejs.org/en/)
+  - You'll know you've installed nodejs right if you can run:
+    - `node --version` and get an output like: `vx.x.x`
+- [Yarn](https://yarnpkg.com/getting-started/install) instead of `npm`
+  - You'll know you've installed yarn right if you can run:
+    - `yarn --version` and get an output like: `x.x.x`
+    - You might need to [install it with `npm`](https://classic.yarnpkg.com/lang/en/docs/install/) or `corepack`
+
+## INSTALL (Quick Start)
 ```shell
+git clone https://github.com/tokamak-network/Raffle-Bicorn-RX.git
+cd Raffle-Bicorn-RX
 yarn
 ```
 
 ## SET .env
 ```shell
-ALCHEMY_MAINNET_RPC_URL=<GET_URL_FROM_https://dashboard.alchemy.com/>
-MAINNET_RPC_URL=<GET_URL_FROM_https://app.infura.io/dashboard>
-SEPOLIA_RPC_URL=<GET_URL_FROM_https://app.infura.io/dashboard>
-ALCHEMY_SEPOLIA_RPC_URL=<GET_URL_FROM_https://dashboard.alchemy.com/>
-POLYGON_MAINNET_RPC_URL=<GET_URL_FROM_https://app.infura.io/dashboard>
-PRIVATE_KEY=<PRIVATE_KEY>
-ETHERSCAN_API_KEY=<GET_KEY_FROM_https://etherscan.io/myapikey/>
+MAINNET_RPC_URL=
+SEPOLIA_RPC_URL=
+POLYGON_MAINNET_RPC_URL=
+PRIVATE_KEY=
+ETHERSCAN_API_KEY=
 REPORT_GAS=true
-COINMARKETCAP_API_KEY=<GET_KEY_FROM_https://pro.coinmarketcap.com/account/>
+COINMARKETCAP_API_KEY=
+```
+- `MAINNET_RPC_URL`, `SEPOLIA_RPC_URL`, `POLYGON_MAINNET_RPC_URL`
+  - Get url from [Infura](https://app.infura.io/dashboard) or [Alchemy](https://alchemy.com/?a=673c802981)
+- PRIVATE_KEY
+  - The private key of your account (like from [metamask](https://metamask.io/)). **NOTE:** FOR DEVELOPMENT, PLEASE USE A KEY THAT DOESN'T HAVE ANY REAL FUNDS ASSOCIATED WITH IT.
+  - You can [learn how to export it here](https://metamask.zendesk.com/hc/en-us/articles/360015289632-How-to-Export-an-Account-Private-Key).
+
+## DEPLOY
+### Hardhat
+```
+yarn hardhat deploy --tags raffle
+```
+### Sepolia
+- Get testnet ETH
+  - Head over to [Sepolia Faucet](https://sepoliafaucet.com/) or [faucets.chain.link](https://faucets.chain.link/) and get some testnet ETH. you should see the ETH show up in your metamask.
+```
+yarn hardhat deploy --network sepolia --tags raffle
 ```
 
-## DEPLOYMENT & VERIFICATION
-- Guide(login required) : https://www.notion.so/onther/verify-contract-4b72acaa7e6c4dd0a8ee09fddfa6c539
-### to localhost
-```shell
-npx hardhat node
-#Started HTTP and WebSocket JSON-RPC server at http://127.0.0.1:8545/
-npx hardhat deploy --network localhost --tags raffle
-#deploying "CommitRecover" (tx: 0xec0ed0faa71c54e85ecec9347227609b69acd980e00e35a1e3839bc71409b222)...: deployed at 0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512 with 2821690 gas
+## Verify on Etherscan
+In it's current state, if you have your api key set in .env, it will auto verify sepolia contracts.
+
+However, you can manual verify with:
+
+```
+yarn hardhat verify DEPLOYED_CONTRACT_ADDRESS --network sepolia
 ```
 
-### to target network
-```shell
-## CHANGE in hardhat.config.ts files at network :{} section
-## It will deploy and verify, If verify gives an error, you can simply run the command one more time.
-npx hardhat deploy --network <WRITE_YOUR_OWN_NETWORK_NAME> --tags raffle
+## Testing
 ```
-
-## TEST
-
-### WIP
+yarn hardhat test --grep "Raffle Unit Test2"
+```

@@ -11,8 +11,18 @@ import "hardhat-contract-sizer"
 import { HardhatUserConfig } from "hardhat/config"
 /** @type import('hardhat/config').HardhatUserConfig */
 
-const MAINNET_RPC_URL = process.env.MAINNET_RPC_URL || process.env.ALCHEMY_MAINNET_RPC_URL
-const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL || process.env.ALCHEMY_SEPOLIA_RPC_URL
+const optimizerSettings = {
+    optimizer: {
+        enabled: true,
+        runs: 1000000,
+        details: {
+            yul: false,
+        },
+    },
+}
+
+const MAINNET_RPC_URL = process.env.MAINNET_RPC_URL
+const SEPOLIA_RPC_URL = process.env.SEPOLIA_RPC_URL
 const POLYGON_MAINNET_RPC_URL = process.env.POLYGON_MAINNET_RPC_URL
 const PRIVATE_KEY = process.env.PRIVATE_KEY
 
@@ -116,10 +126,11 @@ const config: HardhatUserConfig = {
         ],
     },
     gasReporter: {
-        enabled: false,
-        currency: "USD",
-        outputFile: "gas-report.txt",
-        noColors: true,
+        enabled: true,
+        currency: "ETH",
+        //outputFile: "gas-report.txt",
+        //noColors: true,
+        gasPriceApi: "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
         coinmarketcap: process.env.COINMARKETCAP_API_KEY,
     },
     namedAccounts: {
@@ -134,11 +145,12 @@ const config: HardhatUserConfig = {
     solidity: {
         compilers: [
             {
-                version: "0.8.17",
+                version: "0.8.22",
+                settings: optimizerSettings,
             },
             {
-                version: "0.8.19",
-                //settings: { optimizer: { enabled: true, runs: 100 }, viaIR: true },
+                version: "0.8.17",
+                settings: optimizerSettings,
             },
         ],
     },
