@@ -3,6 +3,20 @@
 pragma solidity ^0.8.22;
 import "./libraries/Pietrzak_VDF.sol";
 
+error AlreadyCommitted();
+error NotCommittedParticipant();
+error AlreadyRevealed();
+error ModExpRevealNotMatchCommit();
+error NotAllRevealed();
+error OmegaAlreadyCompleted();
+error FunctionInvalidAtThisStage();
+error TNotMatched();
+error NotVerified();
+error RecovNotMatchX();
+error StageNotFinished();
+error CommitRevealDurationLessThanCommitDuration();
+error AllFinished();
+
 /**
  * @title Bicorn-RX Commit-Reveal-Recover
  * @author Justin g
