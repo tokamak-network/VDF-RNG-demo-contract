@@ -16,8 +16,8 @@ import fs from "fs"
 import { network } from "hardhat"
 const FRONT_END_ADDRESS_FILE = __dirname + "/../../demo-front2/constants/contractAddress.json"
 const FRONT_END_ABI_FILE = __dirname + "/../../demo-front2/constants/abi.json"
-export default async function deployRaffle() {
-    if (process.env.UPDATE_FRONT_END) {
+export default async function updateFrontEnd() {
+    if (process.env.UPDATE_ABI_ADDRESS_FRONTEND_VDFPROVER) {
         console.log("Updating front end...")
         await updateContractAddress()
         await updateAbi()
@@ -42,4 +42,4 @@ async function updateContractAddress() {
     }
     fs.writeFileSync(FRONT_END_ADDRESS_FILE, JSON.stringify(currentAddress))
 }
-deployRaffle.tags = ["all", "frontend"]
+updateFrontEnd.tags = ["all", "frontend"]
