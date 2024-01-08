@@ -17,7 +17,7 @@ const VDF_PROVER_ABI_FILE = __dirname + "/../../VDF-prover/contractABI.json"
 
 export default async function updateVDFProver() {
     if (process.env.UPDATE_ABI_ADDRESS_FRONTEND_VDFPROVER) {
-        console.log("Updating front end...")
+        console.log("Updating vdf-prover...")
         await updateAbi()
     }
 }
