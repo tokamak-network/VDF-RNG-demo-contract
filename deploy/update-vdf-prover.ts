@@ -25,3 +25,4 @@ async function updateAbi() {
     const raffle = await ethers.getContract("Raffle")
     fs.writeFileSync(VDF_PROVER_ABI_FILE, raffle.interface.formatJson())
 }
+updateVDFProver.tags = ["all", "vdf-prover"]
