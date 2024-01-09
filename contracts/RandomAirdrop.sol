@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.22;
 
-import {CommitRecover} from "./Bicorn-RX/CommitRecover.sol";
-import "./Bicorn-RX/libraries/Pietrzak_VDF.sol";
-import "./Bicorn-RX/libraries/BigNumbers.sol";
+import {CommitRevealRecoverRNG} from "./CommitRevealRecoverRNG/CommitRevealRecoverRNG.sol";
+import "./CommitRevealRecoverRNG/libraries/Pietrzak_VDF.sol";
+import "./CommitRevealRecoverRNG/libraries/BigNumbers.sol";
 
-contract Raffle is CommitRecover {
+contract RandomAirdrop is CommitRevealRecoverRNG {
     using BigNumbers for *;
     mapping(address participantAddress => uint256[] rounds) private participatedRounds;
-    uint256 public raffleRound;
+    uint256 public randomAirdropRound;
 
-    event RaffleEntered(address indexed _entrant, uint256 _timestamp);
+    event RandomAirdropEntered(address indexed _entrant, uint256 _timestamp);
 
     function setUp(
         uint256 _commitDuration,
@@ -18,17 +18,17 @@ contract Raffle is CommitRecover {
         BigNumber calldata _n,
         Pietrzak_VDF.VDFClaim[] calldata _proofs
     ) public {
-        checkStage(raffleRound);
-        if (valuesAtRound[raffleRound].stage != Stages.Finished) revert StageNotFinished();
+        checkStage(randomAirdropRound);
+        if (valuesAtRound[randomAirdropRound].stage != Stages.Finished) revert StageNotFinished();
         uint256 _round = _setUp(_commitDuration, _commitRevealDuration, _n, _proofs);
-        raffleRound = _round;
+        randomAirdropRound = _round;
     }
 
-    function enterRafByCommit(BigNumber memory _c) public {
-        uint256 _round = raffleRound;
+    function enterEventByCommit(BigNumber memory _c) public {
+        uint256 _round = randomAirdropRound;
         _commit(_round, _c);
         participatedRounds[msg.sender].push(_round);
-        emit RaffleEntered(msg.sender, block.timestamp);
+        emit RandomAirdropEntered(msg.sender, block.timestamp);
     }
 
     function getRankPointOfEachParticipants(
