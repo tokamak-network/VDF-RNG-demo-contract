@@ -4,14 +4,14 @@ pragma solidity ^0.8.22;
 import "./libraries/Pietrzak_VDF.sol";
 
 /**
- * @title Bicorn-RX Commit-Reveal-Recover
+ * @title CommitRevealRecoverRNG Commit-Reveal-Recover
  * @author Justin g
  * @notice This contract is for generating random number
  *    1. Finished: Not SetUped | Calculate or recover the random number
  *    2. Commit: participants commit their value
  *    3. Reveal: participants reveal their value
  */
-contract CommitRecover {
+contract CommitRevealRecoverRNG {
     using BigNumbers for BigNumber;
     using Pietrzak_VDF for *;
     /* Type declaration */
