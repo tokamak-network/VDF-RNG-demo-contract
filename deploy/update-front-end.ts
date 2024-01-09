@@ -14,8 +14,8 @@
 import { ethers } from "hardhat"
 import fs from "fs"
 import { network } from "hardhat"
-const FRONT_END_ADDRESS_FILE = __dirname + "/../../demo-front2/constants/contractAddress.json"
-const FRONT_END_ABI_FILE = __dirname + "/../../demo-front2/constants/abi.json"
+const FRONT_END_ADDRESS_FILE = __dirname + "/../../demo-front/constants/contractAddress.json"
+const FRONT_END_ABI_FILE = __dirname + "/../../demo-front/constants/abi.json"
 export default async function updateFrontEnd() {
     if (process.env.UPDATE_ABI_ADDRESS_FRONTEND_VDFPROVER) {
         console.log("Updating front end...")
