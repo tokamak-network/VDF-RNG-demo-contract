@@ -3,17 +3,17 @@ import { assert, expect } from "chai"
 import { BigNumberish, Contract, ContractTransactionReceipt, Log } from "ethers"
 import { network, deployments, ethers, getNamedAccounts } from "hardhat"
 import { developmentChains, networkConfig } from "../../helper-hardhat-config"
-import { Raffle, Raffle__factory } from "../../typechain-types"
+import { RandomAirdrop, RandomAirdrop__factory } from "../../typechain-types"
 import { TestCase, BigNumber, SetUpParams, CommitParams, RevealParams } from "../shared/interfaces"
 import { testCases } from "../shared/testcases"
 import {
     createTestCases,
     createTestCases2,
     getRankPointOfEachParticipants,
-    deployRaffle,
-    setUpRaffleRound,
+    deployRandomAirdrop,
+    setUpRandomAirdropRound,
     initializedContractCorrectly,
-    deployFirstTestCaseRaffleContract,
+    deployFirstTestCaseRandomAirdropContract,
     commit,
     reveal,
     getWinnerAddress,
@@ -25,7 +25,7 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
 
 !developmentChains.includes(network.name)
     ? describe.skip
-    : describe("Raffle Unit Test2", () => {
+    : describe("RandomAirdrop Unit Test2", () => {
           const testcases: TestCase[] = createTestCases2()
           const chainId = network.config.chainId
           let deployer: SignerWithAddress
@@ -44,29 +44,32 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
           describe("deploy contract and check", () => {
               it("try deploy several times and should pass", async () => {
                   for (let i = 0; i < testcases.length; i++) {
-                      const { raffleContract, receipt } = await deployRaffle()
-                      await assertTestAfterDeploy(raffleContract)
+                      const { randomAirdropContract, receipt } = await deployRandomAirdrop()
+                      await assertTestAfterDeploy(randomAirdropContract)
                   }
               })
           })
           describe("setUp", () => {
               it("setUp for every testcase should pass, multiple rounds", async () => {
                   for (let i = 0; i < testcases.length; i++) {
-                      let { raffleContract, receipt } = await deployRaffle()
+                      let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                       let params: SetUpParams = {
                           commitDuration,
                           commitRevealDuration,
                           n: testcases[i].n,
                           setupProofs: testcases[i].setupProofs,
                       }
-                      let setUpReceipt = await setUpRaffleRound(raffleContract, params)
+                      let setUpReceipt = await setUpRandomAirdropRound(
+                          randomAirdropContract,
+                          params,
+                      )
                   }
               })
           })
           let signers: SignerWithAddress[]
           describe("commit", () => {
               it("commit for every testcase should pass, multiple rounds", async () => {
-                  let { raffleContract, receipt } = await deployRaffle()
+                  let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                   for (let round = 0; round < testcases.length; round++) {
                       let params: SetUpParams = {
                           commitDuration,
@@ -74,21 +77,24 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                           n: testcases[round].n,
                           setupProofs: testcases[round].setupProofs,
                       }
-                      let setUpReceipt = await setUpRaffleRound(raffleContract, params)
+                      let setUpReceipt = await setUpRandomAirdropRound(
+                          randomAirdropContract,
+                          params,
+                      )
                       signers = await ethers.getSigners()
                       for (let j = 0; j < testcases[round].commitList.length; j++) {
                           let commitParams: CommitParams = {
                               round: round,
                               commit: testcases[round].commitList[j],
                           }
-                          await commit(raffleContract, signers[j], commitParams)
+                          await commit(randomAirdropContract, signers[j], commitParams)
                       }
                   }
               })
           })
           describe("reveal", () => {
               it("reveal for every testcase should pass, multiple rounds", async () => {
-                  let { raffleContract, receipt } = await deployRaffle()
+                  let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                   for (let round = 0; round < testcases.length; round++) {
                       let params: SetUpParams = {
                           commitDuration,
@@ -96,14 +102,17 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                           n: testcases[round].n,
                           setupProofs: testcases[round].setupProofs,
                       }
-                      let setUpReceipt = await setUpRaffleRound(raffleContract, params)
+                      let setUpReceipt = await setUpRandomAirdropRound(
+                          randomAirdropContract,
+                          params,
+                      )
                       signers = await ethers.getSigners()
                       for (let j = 0; j < testcases[round].commitList.length; j++) {
                           let commitParams: CommitParams = {
                               round: round,
                               commit: testcases[round].commitList[j],
                           }
-                          await commit(raffleContract, signers[j], commitParams)
+                          await commit(randomAirdropContract, signers[j], commitParams)
                       }
                       await time.increase(commitDuration)
                       for (let j = 0; j < testcases[round].randomList.length; j++) {
@@ -111,14 +120,14 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                               round: round,
                               reveal: testcases[round].randomList[j],
                           }
-                          await reveal(raffleContract, signers[j], revealParams)
+                          await reveal(randomAirdropContract, signers[j], revealParams)
                       }
                   }
               })
           })
           describe("calculate Omega", () => {
               it("All Revealed, Calculated Omega should be correct for every testcase, multiple rounds", async () => {
-                  let { raffleContract, receipt } = await deployRaffle()
+                  let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                   for (let round = 0; round < testcases.length; round++) {
                       let params: SetUpParams = {
                           commitDuration,
@@ -126,14 +135,17 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                           n: testcases[round].n,
                           setupProofs: testcases[round].setupProofs,
                       }
-                      let setUpReceipt = await setUpRaffleRound(raffleContract, params)
+                      let setUpReceipt = await setUpRandomAirdropRound(
+                          randomAirdropContract,
+                          params,
+                      )
                       signers = await ethers.getSigners()
                       for (let j = 0; j < testcases[round].commitList.length; j++) {
                           let commitParams: CommitParams = {
                               round: round,
                               commit: testcases[round].commitList[j],
                           }
-                          await commit(raffleContract, signers[j], commitParams)
+                          await commit(randomAirdropContract, signers[j], commitParams)
                       }
                       await time.increase(commitDuration)
                       for (let j = 0; j < testcases[round].randomList.length; j++) {
@@ -141,11 +153,11 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                               round: round,
                               reveal: testcases[round].randomList[j],
                           }
-                          await reveal(raffleContract, signers[j], revealParams)
+                          await reveal(randomAirdropContract, signers[j], revealParams)
                       }
-                      const tx = await raffleContract.calculateOmega(round)
+                      const tx = await randomAirdropContract.calculateOmega(round)
                       const receipt = await tx.wait()
-                      const omega = (await raffleContract.valuesAtRound(round)).omega
+                      const omega = (await randomAirdropContract.valuesAtRound(round)).omega
                       assertTestAfterGettingOmega(
                           omega,
                           testcases[round].omega,
@@ -156,7 +168,7 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
           })
           describe("recover", () => {
               it("Recovered Omega should be correct for every testcase, multiple rounds", async () => {
-                  let { raffleContract, receipt } = await deployRaffle()
+                  let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                   for (let round = 0; round < testcases.length; round++) {
                       let params: SetUpParams = {
                           commitDuration,
@@ -164,22 +176,25 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                           n: testcases[round].n,
                           setupProofs: testcases[round].setupProofs,
                       }
-                      let setUpReceipt = await setUpRaffleRound(raffleContract, params)
+                      let setUpReceipt = await setUpRandomAirdropRound(
+                          randomAirdropContract,
+                          params,
+                      )
                       signers = await ethers.getSigners()
                       for (let j = 0; j < testcases[round].commitList.length; j++) {
                           let commitParams: CommitParams = {
                               round: round,
                               commit: testcases[round].commitList[j],
                           }
-                          await commit(raffleContract, signers[j], commitParams)
+                          await commit(randomAirdropContract, signers[j], commitParams)
                       }
                       await time.increase(commitDuration)
-                      const tx = await raffleContract.recover(
+                      const tx = await randomAirdropContract.recover(
                           round,
                           testcases[round].recoveryProofs,
                       )
                       const receipt = await tx.wait()
-                      const omega = (await raffleContract.valuesAtRound(round)).omega
+                      const omega = (await randomAirdropContract.valuesAtRound(round)).omega
                       assertTestAfterGettingOmega(
                           omega,
                           testcases[round].omega,
@@ -190,7 +205,7 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
           })
           describe("getRankofEachPariticipants", () => {
               it("getRankofEachPariticipants result from contract should be equal to typescript function", async () => {
-                  let { raffleContract, receipt } = await deployRaffle()
+                  let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                   for (let round = 0; round < testcases.length; round++) {
                       let params: SetUpParams = {
                           commitDuration,
@@ -198,34 +213,40 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                           n: testcases[round].n,
                           setupProofs: testcases[round].setupProofs,
                       }
-                      let setUpReceipt = await setUpRaffleRound(raffleContract, params)
+                      let setUpReceipt = await setUpRandomAirdropRound(
+                          randomAirdropContract,
+                          params,
+                      )
                       signers = await ethers.getSigners()
                       for (let j = 0; j < testcases[round].commitList.length; j++) {
                           let commitParams: CommitParams = {
                               round: round,
                               commit: testcases[round].commitList[j],
                           }
-                          await commit(raffleContract, signers[j], commitParams)
+                          await commit(randomAirdropContract, signers[j], commitParams)
                       }
                       await time.increase(commitDuration)
-                      const tx = await raffleContract.recover(
+                      const tx = await randomAirdropContract.recover(
                           round,
                           testcases[round].recoveryProofs,
                       )
                       const receipt = await tx.wait()
-                      const omega = (await raffleContract.valuesAtRound(round)).omega
+                      const omega = (await randomAirdropContract.valuesAtRound(round)).omega
                       assertTestAfterGettingOmega(
                           omega,
                           testcases[round].omega,
                           testcases[round].recoveredOmega,
                       )
 
-                      console.log("participatedRound", await raffleContract.getParticipatedRounds())
+                      console.log(
+                          "participatedRound",
+                          await randomAirdropContract.getParticipatedRounds(),
+                      )
 
                       const randPointOfEachParticipants =
-                          await raffleContract.getRankPointOfEachParticipants(round)
+                          await randomAirdropContract.getRankPointOfEachParticipants(round)
                       let typescriptRusult = await getRankPointOfEachParticipants(
-                          raffleContract,
+                          randomAirdropContract,
                           round,
                       )
                       for (let i = 0; i < randPointOfEachParticipants[1].length; i++) {

@@ -22,7 +22,7 @@ export default async function updateVDFProver() {
     }
 }
 async function updateAbi() {
-    const raffle = await ethers.getContract("Raffle")
-    fs.writeFileSync(VDF_PROVER_ABI_FILE, raffle.interface.formatJson())
+    const randomAirdrop = await ethers.getContract("RandomAirdrop")
+    fs.writeFileSync(VDF_PROVER_ABI_FILE, randomAirdrop.interface.formatJson())
 }
 updateVDFProver.tags = ["all", "vdf-prover"]

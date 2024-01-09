@@ -24,21 +24,21 @@ export default async function updateFrontEnd() {
     }
 }
 async function updateAbi() {
-    const raffle = await ethers.getContract("Raffle")
-    fs.writeFileSync(FRONT_END_ABI_FILE, raffle.interface.formatJson())
+    const randomAirdrop = await ethers.getContract("RandomAirdrop")
+    fs.writeFileSync(FRONT_END_ABI_FILE, randomAirdrop.interface.formatJson())
 }
 
 async function updateContractAddress() {
-    const raffle = await ethers.getContract("Raffle")
+    const randomAirdrop = await ethers.getContract("RandomAirdrop")
     const chainId = network.config.chainId?.toString()!
     const currentAddress = JSON.parse(fs.readFileSync(FRONT_END_ADDRESS_FILE, "utf8"))
     if (chainId in currentAddress) {
-        if (!currentAddress[chainId].includes(await raffle.getAddress())) {
-            currentAddress[chainId].push(await raffle.getAddress())
+        if (!currentAddress[chainId].includes(await randomAirdrop.getAddress())) {
+            currentAddress[chainId].push(await randomAirdrop.getAddress())
         }
     }
     {
-        currentAddress[chainId] = [await raffle.getAddress()]
+        currentAddress[chainId] = [await randomAirdrop.getAddress()]
     }
     fs.writeFileSync(FRONT_END_ADDRESS_FILE, JSON.stringify(currentAddress))
 }

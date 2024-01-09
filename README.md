@@ -1,6 +1,6 @@
 # Christmas Gift Event using Commit-Reveal-Recover Random Number Generation(RNG)
 
-Raffle App using Commit Reveal Recover<br>
+RandomAirdrop App using Commit Reveal Recover<br>
 
 # Getting Started
 ## Requirements
@@ -17,8 +17,8 @@ Raffle App using Commit Reveal Recover<br>
 
 ## INSTALL (Quick Start)
 ```shell
-git clone https://github.com/tokamak-network/Raffle-Bicorn-RX.git
-cd Raffle-Bicorn-RX
+git clone https://github.com/tokamak-network/RandomAirdrop-CommitRevealRecoverRNG.git
+cd RandomAirdrop-CommitRevealRecoverRNG
 yarn
 ```
 
@@ -41,13 +41,13 @@ COINMARKETCAP_API_KEY=
 ## DEPLOY
 ### Hardhat
 ```
-yarn hardhat deploy --tags raffle
+yarn hardhat deploy --tags randomAirdrop
 ```
 ### Sepolia
 - Get testnet ETH
   - Head over to [Sepolia Faucet](https://sepoliafaucet.com/) or [faucets.chain.link](https://faucets.chain.link/) and get some testnet ETH. you should see the ETH show up in your metamask.
 ```
-yarn hardhat deploy --network sepolia --tags raffle
+yarn hardhat deploy --network sepolia --tags randomAirdrop
 ```
 
 ## Verify on Etherscan
@@ -61,5 +61,5 @@ yarn hardhat verify DEPLOYED_CONTRACT_ADDRESS --network sepolia
 
 ## Testing
 ```
-yarn hardhat test --grep "Raffle Unit Test2"
+yarn hardhat test --grep "RandomAirdrop Unit Test2"
 ```

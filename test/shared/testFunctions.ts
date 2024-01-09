@@ -25,17 +25,17 @@ import { developmentChains, networkConfig } from "../../helper-hardhat-config"
 import fs from "fs"
 
 export const getRankPointOfEachParticipants = async (
-    raffleContract: Contract,
+    randomAirdropContract: Contract,
     round: number,
 ): Promise<{ addresses: string[]; rankPoints: bigint[] }> => {
     let addresses: string[] = []
     let rankPoints: bigint[] = []
     let a: bigint = BigInt(
-        ethers.keccak256(await raffleContract.valuesAtRound(round).then((x) => x.omega.val)),
+        ethers.keccak256(await randomAirdropContract.valuesAtRound(round).then((x) => x.omega.val)),
     )
-    let valuesAtRound: any = await raffleContract.valuesAtRound(round)
+    let valuesAtRound: any = await randomAirdropContract.valuesAtRound(round)
     for (let i = 0; i < valuesAtRound.numOfParticipants; i++) {
-        let commitRevealValues: any = await raffleContract.commitRevealValues(round, i)
+        let commitRevealValues: any = await randomAirdropContract.commitRevealValues(round, i)
         let address: string = commitRevealValues.participantAddress
         addresses.push(address)
         let b: bigint = BigInt(ethers.keccak256(address))
@@ -45,17 +45,17 @@ export const getRankPointOfEachParticipants = async (
     return { addresses, rankPoints }
 }
 
-export const getWinnerAddress = async (raffleContract: Contract, round: number) => {
+export const getWinnerAddress = async (randomAirdropContract: Contract, round: number) => {
     let winnerIndex: number = 0
-    let setUpValuesAtRound: any = await raffleContract.setUpValuesAtRound(round)
-    let valuesAtRound: any = await raffleContract.valuesAtRound(round)
+    let setUpValuesAtRound: any = await randomAirdropContract.setUpValuesAtRound(round)
+    let valuesAtRound: any = await randomAirdropContract.valuesAtRound(round)
     let _n: bigint = setUpValuesAtRound.n.val
     let smallest = _n + 1n
     let _omega: bigint = valuesAtRound.omega.val
     let numOfParticipants: number = valuesAtRound.numOfParticipants
 
     for (let i = 0; i < numOfParticipants; i++) {
-        let participantAddress: bigint = await raffleContract
+        let participantAddress: bigint = await randomAirdropContract
             .commitRevealValues(round, i)
             .then((x) => BigInt(x.participantAddress))
         let _value: bigint = BigInt(BigInt(participantAddress) % BigInt(_n)) - BigInt(_omega)
@@ -65,7 +65,7 @@ export const getWinnerAddress = async (raffleContract: Contract, round: number) 
             winnerIndex = i
         }
     }
-    return await raffleContract
+    return await randomAirdropContract
         .commitRevealValues(round, winnerIndex)
         .then((x) => x.participantAddress)
 }
@@ -327,61 +327,66 @@ export const createTestCases = (testcases: any[]) => {
     })
     return result
 }
-export const deployRaffle = async () => {
-    let raffleContract = await ethers.deployContract("Raffle")
-    raffleContract = await raffleContract.waitForDeployment()
-    let tx = raffleContract.deploymentTransaction()
+export const deployRandomAirdrop = async () => {
+    let randomAirdropContract = await ethers.deployContract("RandomAirdrop")
+    randomAirdropContract = await randomAirdropContract.waitForDeployment()
+    let tx = randomAirdropContract.deploymentTransaction()
     let receipt = await tx?.wait()
-    return { raffleContract, receipt }
+    return { randomAirdropContract, receipt }
 }
 
-export const setUpRaffleRound = async (raffleContract: Contract, params: SetUpParams) => {
-    const setUpTx = await raffleContract.setUp(
+export const setUpRandomAirdropRound = async (
+    randomAirdropContract: Contract,
+    params: SetUpParams,
+) => {
+    const setUpTx = await randomAirdropContract.setUp(
         params.commitDuration,
         params.commitRevealDuration,
         params.n,
         params.setupProofs,
     )
     const receipt = await setUpTx.wait()
-    return { raffleContract, receipt }
+    return { randomAirdropContract, receipt }
 }
 
 export const commit = async (
-    raffleContract: Contract,
+    randomAirdropContract: Contract,
     signer: SignerWithAddress,
     params: CommitParams,
 ) => {
-    const tx = await (raffleContract.connect(signer) as Contract).enterRafByCommit(params.commit)
+    const tx = await (randomAirdropContract.connect(signer) as Contract).enterEventByCommit(
+        params.commit,
+    )
     const receipt = await tx.wait()
-    return { raffleContract, receipt }
+    return { randomAirdropContract, receipt }
 }
 
 export const reveal = async (
-    raffleContract: Contract,
+    randomAirdropContract: Contract,
     signer: SignerWithAddress,
     params: RevealParams,
 ) => {
-    const tx = await (raffleContract.connect(signer) as Contract).reveal(
+    const tx = await (randomAirdropContract.connect(signer) as Contract).reveal(
         params.round,
         params.reveal,
     )
     const receipt = await tx.wait()
-    return { raffleContract, receipt }
+    return { randomAirdropContract, receipt }
 }
 
-export const deployAndSetUpRaffleContract = async (params: any) => {
-    let raffle = await ethers.deployContract("Raffle", [])
-    raffle = await raffle.waitForDeployment()
-    const tx = raffle.deploymentTransaction()
+export const deployAndSetUpRandomAirdropContract = async (params: any) => {
+    let randomAirdrop = await ethers.deployContract("RandomAirdrop", [])
+    randomAirdrop = await randomAirdrop.waitForDeployment()
+    const tx = randomAirdrop.deploymentTransaction()
     let receipt = await tx?.wait()
     console.log("deploy gas used: ", receipt?.gasUsed?.toString())
-    const setUpTx = await raffle.setUp(...params)
+    const setUpTx = await randomAirdrop.setUp(...params)
     receipt = await setUpTx.wait()
     console.log("setUp gas used: ", receipt?.gasUsed?.toString())
-    return { raffle, receipt }
+    return { randomAirdrop, receipt }
 }
 
-export const deployFirstTestCaseRaffleContract = async () => {
+export const deployFirstTestCaseRandomAirdropContract = async () => {
     const testcases = createTestCases(testCases)
     const testcaseNum = 0
     let params = [
@@ -390,7 +395,7 @@ export const deployFirstTestCaseRaffleContract = async () => {
         testcases[testcaseNum].n,
         testcases[testcaseNum].setupProofs,
     ]
-    const { raffle, receipt } = await deployAndSetUpRaffleContract(params)
+    const { randomAirdrop, receipt } = await deployAndSetUpRandomAirdropContract(params)
     //get states
     // const {
     //     stage,
@@ -405,10 +410,10 @@ export const deployFirstTestCaseRaffleContract = async () => {
     //     deployedEvent,
     //     deployedBlockNum,
     //     deployedTimestamp,
-    // } = await getStatesAfterDeployment(raffle, receipt as ContractTransactionReceipt)
+    // } = await getStatesAfterDeployment(randomAirdrop, receipt as ContractTransactionReceipt)
     //return states
     return {
-        raffle,
+        randomAirdrop,
         receipt,
         testcases,
         params,
@@ -428,26 +433,26 @@ export const deployFirstTestCaseRaffleContract = async () => {
 }
 
 export const getStatesAfterDeployment = async (
-    raffleContract: Contract,
+    randomAirdropContract: Contract,
     receipt: ContractTransactionReceipt,
 ) => {
     // contract states
-    const stage = await raffleContract.stage()
-    const commitSetUpTime = await raffleContract.setUpTime()
-    const commitDuration = await raffleContract.commitDuration()
-    const commitRevealDuration = await raffleContract.commitRevealDuration()
-    const round = await raffleContract.round()
+    const stage = await randomAirdropContract.stage()
+    const commitSetUpTime = await randomAirdropContract.setUpTime()
+    const commitDuration = await randomAirdropContract.commitDuration()
+    const commitRevealDuration = await randomAirdropContract.commitRevealDuration()
+    const round = await randomAirdropContract.round()
     //console.log("round", round)
-    const valuesAtRound = await raffleContract.valuesAtRound(round)
+    const valuesAtRound = await randomAirdropContract.valuesAtRound(round)
     const n = valuesAtRound.n
     const g = valuesAtRound.g
     const h = valuesAtRound.h
     const T = valuesAtRound.T
 
     // event
-    const topic = raffleContract.interface.getEvent("SetUp")
+    const topic = randomAirdropContract.interface.getEvent("SetUp")
     const log = receipt.logs.find((x) => x.topics.indexOf(topic?.topicHash!) >= 0)
-    const deployedEvent = raffleContract.interface.parseLog({
+    const deployedEvent = randomAirdropContract.interface.parseLog({
         topics: log?.topics! as string[],
         data: log?.data!,
     })
@@ -474,7 +479,7 @@ export const getStatesAfterDeployment = async (
 }
 
 export const initializedContractCorrectly = async (
-    raffleContract: Contract,
+    randomAirdropContract: Contract,
     receipt: ContractTransactionReceipt,
     testcase: TestCase,
 ) => {
@@ -491,7 +496,7 @@ export const initializedContractCorrectly = async (
         deployedEvent,
         deployedBlockNum,
         deployedTimestamp,
-    } = await getStatesAfterDeployment(raffleContract, receipt)
+    } = await getStatesAfterDeployment(randomAirdropContract, receipt)
 
     assert.equal(
         commitSetUpTime,
@@ -535,7 +540,7 @@ export const initializedContractCorrectly = async (
     // assert.equal(round, deployedEvent!.args?.round, "round should be equal to deployedEvent")
 }
 
-interface RaffleValue {
+interface RandomAirdropValue {
     c: BigNumberish
     a: BigNumberish
     participantAddress: string
@@ -547,22 +552,25 @@ interface UserAtRound {
 }
 
 export const getStatesAfterCommitOrReveal = async (
-    raffleContract: Contract,
+    randomAirdropContract: Contract,
     receipt: ContractTransactionReceipt,
     signer: SignerWithAddress,
     i: number,
 ) => {
     //contract states
-    const count = await raffleContract.count()
-    const stage = await raffleContract.stage()
-    const commitsString = await raffleContract.commitsString()
-    const round = await raffleContract.round()
-    const valuesAtRound = await raffleContract.valuesAtRound(round)
-    const userInfosAtRound: UserAtRound = await raffleContract.userInfosAtRound(
+    const count = await randomAirdropContract.count()
+    const stage = await randomAirdropContract.stage()
+    const commitsString = await randomAirdropContract.commitsString()
+    const round = await randomAirdropContract.round()
+    const valuesAtRound = await randomAirdropContract.valuesAtRound(round)
+    const userInfosAtRound: UserAtRound = await randomAirdropContract.userInfosAtRound(
         signer.address,
         round,
     )
-    const raffleValue: RaffleValue = await raffleContract.raffleValues(round, i)
+    const randomAirdropValue: RandomAirdropValue = await randomAirdropContract.randomAirdropValues(
+        round,
+        i,
+    )
     return {
         count,
         stage,
@@ -570,12 +578,12 @@ export const getStatesAfterCommitOrReveal = async (
         round,
         valuesAtRound,
         userInfosAtRound,
-        raffleValue,
+        randomAirdropValue,
     }
 }
 
 export const revealCheck = async (
-    raffleContract: Contract,
+    randomAirdropContract: Contract,
     receipt: ContractTransactionReceipt,
     random: BigNumber,
     signer: SignerWithAddress,
@@ -591,15 +599,15 @@ export const revealCheck = async (
     //     round,
     //     valuesAtRound,
     //     userInfosAtRound,
-    //     raffleValue,
-    // } = await getStatesAfterCommitOrReveal(raffleContract, receipt, signer, i)
+    //     randomAirdropValue,
+    // } = await getStatesAfterCommitOrReveal(randomAirdropContract, receipt, signer, i)
     //console.log("valuesAtRoundvaluesAtRound, ", valuesAtRound)
     //const { omega, bStar, numOfParticipants, isCompleted } = valuesAtRound
 }
 
 let commitsStringTest: string
 export const commitCheck = async (
-    raffleContract: Contract,
+    randomAirdropContract: Contract,
     receipt: ContractTransactionReceipt,
     commit: BigNumber,
     signer: SignerWithAddress,
@@ -616,8 +624,8 @@ export const commitCheck = async (
     //     round,
     //     valuesAtRound,
     //     userInfosAtRound,
-    //     raffleValue,
-    // } = await getStatesAfterCommitOrReveal(raffleContract, receipt, signer, i)
+    //     randomAirdropValue,
+    // } = await getStatesAfterCommitOrReveal(randomAirdropContract, receipt, signer, i)
     //assert.equal(ii + BigInt(1), count, "count should be equal to i")
     // assert.equal(stage, 0, "stage should be 0")
     // assert.equal(round, 1, "round should be 1")
@@ -637,7 +645,7 @@ export const commitCheck = async (
     // //assert.equal(index, ii, "index should be equal to i")
     // assert.equal(committed, true, "committed should be true")
     // assert.equal(revealed, false, "revealed should be false")
-    //     assert.equal(raffleValue.c, commit, "raffleValue.c should be equal to commit")
-    //     assert.equal(raffleValue.participantAddress, signer.address)
-    //     assert.equal(raffleValue.a, 0, "raffleValue.a should be 0")
+    //     assert.equal(randomAirdropValue.c, commit, "randomAirdropValue.c should be equal to commit")
+    //     assert.equal(randomAirdropValue.participantAddress, signer.address)
+    //     assert.equal(randomAirdropValue.a, 0, "randomAirdropValue.a should be 0")
 }

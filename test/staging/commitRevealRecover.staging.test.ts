@@ -16,13 +16,13 @@
 // import { BigNumberish, Contract, ContractTransactionReceipt, Log } from "ethers"
 // import { network, deployments, ethers, getNamedAccounts } from "hardhat"
 // import { developmentChains, networkConfig } from "../../helper-hardhat-config"
-// import { CommitRecover, CommitRecover__factory } from "../../typechain-types"
+// import { CommitRevealRecoverRNG, CommitRevealRecoverRNG__factory } from "../../typechain-types"
 // import { TestCase, BigNumber, StartParams, CommitParams, RevealParams } from "../shared/interfaces"
 // import { testCases2 } from "../shared/testcases2"
 // import {
 //     createTestCases,
-//     deployCommitRecover,
-//     startCommitRecoverRound,
+//     deployCommitRevealRecoverRNG,
+//     startCommitRevealRecoverRNGRound,
 //     initializedContractCorrectly,
 //     deployFirstTestCaseCommitRevealContract,
 //     commit,
@@ -34,7 +34,7 @@
 
 // !developmentChains.includes(network.name)
 //     ? describe.skip
-//     : describe("CommitRecover Staging Test", () => {
+//     : describe("CommitRevealRecoverRNG Staging Test", () => {
 //           const testcases: TestCase[] = createTestCases(testCases2)
 //           const chainId = network.config.chainId
 //           let deployer: SignerWithAddress
@@ -57,7 +57,7 @@
 //           const testCaseNum = 0
 //           describe("test 1 round", () => {
 //               it("commit recover", async () => {
-//                   let { commitRecoverContract, receipt } = await deployCommitRecover()
+//                   let { CommitRevealRecoverRNGContract, receipt } = await deployCommitRevealRecoverRNG()
 //                   for (let round = 0; round < testcases.length; round++) {
 //                       let params: StartParams = {
 //                           commitDuration,
@@ -65,8 +65,8 @@
 //                           n: testcases[round].n,
 //                           setupProofs: testcases[round].setupProofs,
 //                       }
-//                       let startReceipt = await startCommitRecoverRound(
-//                           commitRecoverContract,
+//                       let startReceipt = await startCommitRevealRecoverRNGRound(
+//                           CommitRevealRecoverRNGContract,
 //                           params,
 //                       )
 //                       signers = await ethers.getSigners()
@@ -75,15 +75,15 @@
 //                               round: round,
 //                               commit: testcases[round].commitList[j],
 //                           }
-//                           await commit(commitRecoverContract, signers[j], commitParams)
+//                           await commit(CommitRevealRecoverRNGContract, signers[j], commitParams)
 //                       }
 //                       await time.increase(commitDuration)
-//                       const tx = await commitRecoverContract.recover(
+//                       const tx = await CommitRevealRecoverRNGContract.recover(
 //                           round,
 //                           testcases[round].recoveryProofs,
 //                       )
 //                       const receipt = await tx.wait()
-//                       const omega = (await commitRecoverContract.valuesAtRound(round)).omega
+//                       const omega = (await CommitRevealRecoverRNGContract.valuesAtRound(round)).omega
 //                       assertTestAfterGettingOmega(
 //                           omega,
 //                           testcases[round].omega,
@@ -92,7 +92,7 @@
 //                   }
 //               })
 //               it("commit reveal calculateOmega", async () => {
-//                   let { commitRecoverContract, receipt } = await deployCommitRecover()
+//                   let { CommitRevealRecoverRNGContract, receipt } = await deployCommitRevealRecoverRNG()
 //                   for (let round = 0; round < testcases.length; round++) {
 //                       let params: StartParams = {
 //                           commitDuration,
@@ -100,8 +100,8 @@
 //                           n: testcases[round].n,
 //                           setupProofs: testcases[round].setupProofs,
 //                       }
-//                       let startReceipt = await startCommitRecoverRound(
-//                           commitRecoverContract,
+//                       let startReceipt = await startCommitRevealRecoverRNGRound(
+//                           CommitRevealRecoverRNGContract,
 //                           params,
 //                       )
 //                       signers = await ethers.getSigners()
@@ -110,7 +110,7 @@
 //                               round: round,
 //                               commit: testcases[round].commitList[j],
 //                           }
-//                           await commit(commitRecoverContract, signers[j], commitParams)
+//                           await commit(CommitRevealRecoverRNGContract, signers[j], commitParams)
 //                       }
 //                       await time.increase(commitDuration)
 //                       for (let j = 0; j < testcases[round].randomList.length; j++) {
@@ -118,11 +118,11 @@
 //                               round: round,
 //                               reveal: testcases[round].randomList[j],
 //                           }
-//                           await reveal(commitRecoverContract, signers[j], revealParams)
+//                           await reveal(CommitRevealRecoverRNGContract, signers[j], revealParams)
 //                       }
-//                       const tx = await commitRecoverContract.calculateOmega(round)
+//                       const tx = await CommitRevealRecoverRNGContract.calculateOmega(round)
 //                       const receipt = await tx.wait()
-//                       const omega = (await commitRecoverContract.valuesAtRound(round)).omega
+//                       const omega = (await CommitRevealRecoverRNGContract.valuesAtRound(round)).omega
 //                       assertTestAfterGettingOmega(
 //                           omega,
 //                           testcases[round].omega,
