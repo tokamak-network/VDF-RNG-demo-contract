@@ -83,7 +83,7 @@
 //                           testcases[round].recoveryProofs,
 //                       )
 //                       const receipt = await tx.wait()
-//                       const omega = (await CommitRevealRecoverRNGContract.valuesAtRound(round)).omega
+//                       const omega = (await CommitRevealRecoverRNGContract.getValuesAtRound(round)).omega
 //                       assertTestAfterGettingOmega(
 //                           omega,
 //                           testcases[round].omega,
@@ -122,7 +122,7 @@
 //                       }
 //                       const tx = await CommitRevealRecoverRNGContract.calculateOmega(round)
 //                       const receipt = await tx.wait()
-//                       const omega = (await CommitRevealRecoverRNGContract.valuesAtRound(round)).omega
+//                       const omega = (await CommitRevealRecoverRNGContract.getValuesAtRound(round)).omega
 //                       assertTestAfterGettingOmega(
 //                           omega,
 //                           testcases[round].omega,

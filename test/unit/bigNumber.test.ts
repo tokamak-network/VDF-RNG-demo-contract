@@ -49,12 +49,12 @@ describe("BigNumberTest", () => {
         await bigNumbersTest.waitForDeployment()
         // test sub
         const subResult = arrayToBigNumberStruct(await bigNumbersTest.sub(a, b))
-        console.log("subResult: ", subResult)
+        //console.log("subResult: ", subResult)
         // test cmp
         // returns -1 on a<b, 0 on a==b, 1 on a>b.
         const cmpResult1 = await bigNumbersTest.cmp(a, subResult, false) //-1
-        console.log(cmpResult1)
+        //console.log(cmpResult1)
         const cmpResult2 = await bigNumbersTest.cmp(a, subResult, true) // 1
-        console.log(cmpResult2)
+        //console.log(cmpResult2)
     })
 })

@@ -158,8 +158,8 @@ function getLength(value: number): number {
 
 describe("ethersTest", () => {
     it("ethersTest", async () => {
-        console.log(process.cwd())
+        //console.log(process.cwd())
         let a = createTestCases2()
-        console.log(JSON.stringify(a))
+        //console.log(JSON.stringify(a))
     })
 })

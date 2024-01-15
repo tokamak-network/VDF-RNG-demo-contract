@@ -31,11 +31,13 @@ export const getRankPointOfEachParticipants = async (
     let addresses: string[] = []
     let rankPoints: bigint[] = []
     let a: bigint = BigInt(
-        ethers.keccak256(await randomAirdropContract.valuesAtRound(round).then((x) => x.omega.val)),
+        ethers.keccak256(
+            await randomAirdropContract.getValuesAtRound(round).then((x) => x.omega.val),
+        ),
     )
-    let valuesAtRound: any = await randomAirdropContract.valuesAtRound(round)
+    let valuesAtRound: any = await randomAirdropContract.getValuesAtRound(round)
     for (let i = 0; i < valuesAtRound.numOfParticipants; i++) {
-        let commitRevealValues: any = await randomAirdropContract.commitRevealValues(round, i)
+        let commitRevealValues: any = await randomAirdropContract.getCommitRevealValues(round, i)
         let address: string = commitRevealValues.participantAddress
         addresses.push(address)
         let b: bigint = BigInt(ethers.keccak256(address))
@@ -48,7 +50,7 @@ export const getRankPointOfEachParticipants = async (
 export const getWinnerAddress = async (randomAirdropContract: Contract, round: number) => {
     let winnerIndex: number = 0
     let setUpValuesAtRound: any = await randomAirdropContract.setUpValuesAtRound(round)
-    let valuesAtRound: any = await randomAirdropContract.valuesAtRound(round)
+    let valuesAtRound: any = await randomAirdropContract.getValuesAtRound(round)
     let _n: bigint = setUpValuesAtRound.n.val
     let smallest = _n + 1n
     let _omega: bigint = valuesAtRound.omega.val
@@ -443,7 +445,7 @@ export const getStatesAfterDeployment = async (
     const commitRevealDuration = await randomAirdropContract.commitRevealDuration()
     const round = await randomAirdropContract.round()
     //console.log("round", round)
-    const valuesAtRound = await randomAirdropContract.valuesAtRound(round)
+    const valuesAtRound = await randomAirdropContract.getValuesAtRound(round)
     const n = valuesAtRound.n
     const g = valuesAtRound.g
     const h = valuesAtRound.h
@@ -562,7 +564,7 @@ export const getStatesAfterCommitOrReveal = async (
     const stage = await randomAirdropContract.stage()
     const commitsString = await randomAirdropContract.commitsString()
     const round = await randomAirdropContract.round()
-    const valuesAtRound = await randomAirdropContract.valuesAtRound(round)
+    const valuesAtRound = await randomAirdropContract.getValuesAtRound(round)
     const userInfosAtRound: UserAtRound = await randomAirdropContract.userInfosAtRound(
         signer.address,
         round,
