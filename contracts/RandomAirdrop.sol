@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.22;
+pragma solidity ^0.8.23;
 
-import {CommitRevealRecoverRNG} from "./CommitRevealRecoverRNG/CommitRevealRecoverRNG.sol";
-import "./CommitRevealRecoverRNG/libraries/Pietrzak_VDF.sol";
-import "./CommitRevealRecoverRNG/libraries/BigNumbers.sol";
+import "./CommitRevealRecoverRNG/CommitRevealRecoverRNG.sol";
 
 contract RandomAirdrop is CommitRevealRecoverRNG {
     using BigNumbers for *;
@@ -16,7 +14,7 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
         uint256 _commitDuration,
         uint256 _commitRevealDuration,
         BigNumber calldata _n,
-        Pietrzak_VDF.VDFClaim[] calldata _proofs
+        VDFClaim[] calldata _proofs
     ) public {
         checkStage(randomAirdropRound);
         if (valuesAtRound[randomAirdropRound].stage != Stages.Finished) revert StageNotFinished();
