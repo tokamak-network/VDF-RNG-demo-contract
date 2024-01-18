@@ -36,8 +36,7 @@ async function updateContractAddress() {
         if (!currentAddress[chainId].includes(await randomAirdrop.getAddress())) {
             currentAddress[chainId].push(await randomAirdrop.getAddress())
         }
-    }
-    {
+    } else {
         currentAddress[chainId] = [await randomAirdrop.getAddress()]
     }
     fs.writeFileSync(FRONT_END_ADDRESS_FILE, JSON.stringify(currentAddress))
