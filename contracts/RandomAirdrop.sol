@@ -60,4 +60,8 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
     function getParticipantsAtRound(uint256 _round) external view returns (address[] memory) {
         return participantsAtRound[_round];
     }
+
+    function getParticipantsLengthAtRound(uint256 _round) external view returns (uint256) {
+        return participantsAtRound[_round].length;
+    }
 }
