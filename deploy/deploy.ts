@@ -10,7 +10,10 @@ const deployRandomAirdrop: DeployFunction = async function (hre: HardhatRuntimeE
     const { deployer } = await getNamedAccounts()
     const chainId = network.config.chainId
 
-    const waitBlockConfirmations = chainId === 31337 ? 1 : VERIFICATION_BLOCK_CONFIRMATIONS
+    const waitBlockConfirmations =
+        chainId === 31337 || chainId === 5050 || chainId === 55004 || chainId === 111551115050
+            ? 1
+            : VERIFICATION_BLOCK_CONFIRMATIONS
 
     log("----------------------------------------------------")
     const args: any[] = [] //[10000000000000000n] // 0.01 ETH
