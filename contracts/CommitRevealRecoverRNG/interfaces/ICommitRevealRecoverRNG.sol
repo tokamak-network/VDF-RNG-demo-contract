@@ -100,15 +100,28 @@ interface ICommitRevealRecoverRNG {
     error OmegaAlreadyCompleted();
     error FunctionInvalidAtThisStage();
     error TNotMatched();
-    error NotVerified();
+    error NotVerifiedAtTOne();
     error RecovNotMatchX();
     error StageNotFinished();
     error CommitRevealDurationLessThanCommitDuration();
     error AllFinished();
     error NoneParticipated();
     error ShouldNotBeZero();
+    error TOneNotAtLast();
+    error iNotMatchProofSize();
+    error XPrimeNotEqualAtIndex(uint256 index);
+    error YPrimeNotEqualAtIndex(uint256 index);
 
     /* Functions */
+
+    /**
+     * @param _c participant's commit value
+     * @notice Commit function
+     * @notice The participant's commit value must be less than the modulor
+     * @notice The participant can only commit once
+     * @notice check period, update stage if needed, revert if not currently at commit stage
+     */
+    function commit(uint256 _round, BigNumber memory _c) external;
 
     /**
      * @param _a participant's reveal value
@@ -136,6 +149,21 @@ interface ICommitRevealRecoverRNG {
      * @notice calculate and finalize omega
      */
     function recover(uint256 _round, VDFClaim[] calldata proofs) external;
+
+    /**
+     * @notice SetUp function
+     * @notice The contract must be in the Finished stage
+     * @notice The commit period must be less than the commit + reveal period
+     * @notice The g value must be less than the modulor
+     * @notice reset count, commitsString, isHAndBStarSet, stage, setUpTime, commitDuration, commitRevealDuration, n, g, omega
+     * @notice increase round
+     */
+    function setUp(
+        uint256 _commitDuration,
+        uint256 _commitRevealDuration,
+        BigNumber calldata _n,
+        VDFClaim[] calldata _proofs
+    ) external returns (uint256 _round);
 
     function getNextRound() external view returns (uint256);
 
