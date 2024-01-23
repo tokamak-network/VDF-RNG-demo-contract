@@ -31,8 +31,10 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
 
     function registerNextRound() external {
         uint256 _round = nextRound;
-        if (registerIndexAtRound[msg.sender][_round] != 0) revert AlreadyRegistered();
-        registerIndexAtRound[msg.sender][_round] = participantsAtRound[_round].length;
+        uint256 _participantsAtRoundlength = participantsAtRound[_round].length;
+        if (_participantsAtRoundlength != 0 && registerIndexAtRound[msg.sender][_round] != 0)
+            revert AlreadyRegistered();
+        registerIndexAtRound[msg.sender][_round] = _participantsAtRoundlength;
         participantsAtRound[_round].push(msg.sender);
         participatedRounds[msg.sender].push(_round);
     }
