@@ -15,6 +15,7 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
     error AlreadyRegistered();
 
     event RandomAirdropRegisteredAtRound(address indexed _entrant, uint256 _timestamp);
+    event Registered(address indexed _entrant, uint256 _timestamp);
 
     function setUp(
         uint256 _commitDuration,
@@ -35,6 +36,7 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
         registerIndexPlusOneAtRound[msg.sender][_round] = participantsAtRound[_round].length + 1;
         participantsAtRound[_round].push(msg.sender);
         participatedRounds[msg.sender].push(_round);
+        emit Registered(msg.sender, block.timestamp);
     }
 
     function getRankPointOfEachParticipants(
