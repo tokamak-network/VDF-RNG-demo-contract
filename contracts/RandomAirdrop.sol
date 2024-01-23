@@ -7,7 +7,7 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
     using BigNumbers for *;
     mapping(address participantAddress => uint256[] rounds) private participatedRounds;
     mapping(address participantAddress => mapping(uint256 round => uint256 registerIndex))
-        private registerIndexAtRound;
+        private registerIndexPlusOneAtRound;
     mapping(uint256 round => address[] participants) private participantsAtRound;
     uint256 public randomAirdropRound;
 
@@ -31,10 +31,8 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
 
     function registerNextRound() external {
         uint256 _round = nextRound;
-        uint256 _participantsAtRoundlength = participantsAtRound[_round].length;
-        if (_participantsAtRoundlength != 0 && registerIndexAtRound[msg.sender][_round] != 0)
-            revert AlreadyRegistered();
-        registerIndexAtRound[msg.sender][_round] = _participantsAtRoundlength;
+        if (registerIndexPlusOneAtRound[msg.sender][_round] != 0) revert AlreadyRegistered();
+        registerIndexPlusOneAtRound[msg.sender][_round] = participantsAtRound[_round].length + 1;
         participantsAtRound[_round].push(msg.sender);
         participatedRounds[msg.sender].push(_round);
     }
