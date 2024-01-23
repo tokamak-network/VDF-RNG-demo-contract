@@ -83,7 +83,12 @@ const config: HardhatUserConfig = {
             accounts: [`${process.env.PRIVATE_KEY}`],
             chainId: 55004,
             //gasPrice: 250000,
-            deploy: ["deploy_titan"],
+            //deploy: ["deploy_titan"],
+        },
+        titansepolia: {
+            url: "https://rpc.titan-sepolia-test.tokamak.network",
+            accounts: [`${process.env.PRIVATE_KEY}`],
+            chainId: 111551115050,
         },
     },
     deterministicDeployment: (network: string) => {
@@ -121,6 +126,14 @@ const config: HardhatUserConfig = {
                 urls: {
                     apiURL: "https://explorer.titan.tokamak.network/api",
                     browserURL: "https://explorer.titan.tokamak.network",
+                },
+            },
+            {
+                network: "titansepolia",
+                chainId: 111551115050,
+                urls: {
+                    apiURL: "https://explorer.titan-sepolia-test.tokamak.network/api",
+                    browserURL: "https://explorer.titan-sepolia-test.tokamak.network",
                 },
             },
         ],
