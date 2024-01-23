@@ -5,7 +5,7 @@ pragma solidity ^0.8.23;
 import {BigNumbers} from "./libraries/BigNumbers.sol";
 import "./interfaces/ICommitRevealRecoverRNG.sol";
 
-contract CommitRevealRecoverRNG is ICommitRevealRecoverRNG {
+abstract contract CommitRevealRecoverRNG is ICommitRevealRecoverRNG {
     using BigNumbers for *;
     bytes private constant MODFORHASH =
         hex"0000000000000000000000000000000100000000000000000000000000000000";
@@ -14,14 +14,14 @@ contract CommitRevealRecoverRNG is ICommitRevealRecoverRNG {
     uint256 private constant ONE = 1;
 
     /* State variables */
-    uint256 private nextRound;
+    uint256 internal nextRound;
     mapping(uint256 round => SetUpValueAtRound) private setUpValuesAtRound;
     mapping(uint256 round => ValueAtRound) internal valuesAtRound;
     mapping(uint256 round => mapping(uint256 index => CommitRevealValue))
         internal commitRevealValues;
     mapping(address owner => mapping(uint256 round => UserAtRound)) private userInfosAtRound;
 
-    function _commit(uint256 _round, BigNumber memory _c) internal {
+    function commit(uint256 _round, BigNumber memory _c) external override {
         if (_c.isZero()) revert ShouldNotBeZero();
         if (userInfosAtRound[msg.sender][_round].committed) revert AlreadyCommitted();
         checkStage(_round);
@@ -98,7 +98,7 @@ contract CommitRevealRecoverRNG is ICommitRevealRecoverRNG {
             setUpValuesAtRound[_round].T != proofs[ZERO].T ||
             setUpValuesAtRound[_round].proofSize != _proofsSize
         ) revert TNotMatched();
-        if (!verifyRecursiveHalvingProof(proofs, _n, _proofsSize)) revert NotVerified();
+        verifyRecursiveHalvingProof(proofs, _n, _proofsSize);
         BigNumber memory _recov = BigNumbers.one();
         for (uint256 i; i < _numOfParticipants; i = unchecked_inc(i)) {
             BigNumber memory _c = commitRevealValues[_round][i].c;
@@ -121,7 +121,7 @@ contract CommitRevealRecoverRNG is ICommitRevealRecoverRNG {
         uint256 _proofsSize = _proofs.length;
         if (_commitDuration >= _commitRevealDuration)
             revert CommitRevealDurationLessThanCommitDuration();
-        if (!verifyRecursiveHalvingProof(_proofs, _n, _proofsSize)) revert NotVerified();
+        verifyRecursiveHalvingProof(_proofs, _n, _proofsSize);
         setUpValuesAtRound[_round].setUpTime = block.timestamp;
         setUpValuesAtRound[_round].commitDuration = _commitDuration;
         setUpValuesAtRound[_round].commitRevealDuration = _commitRevealDuration;
@@ -220,11 +220,15 @@ contract CommitRevealRecoverRNG is ICommitRevealRecoverRNG {
         VDFClaim[] calldata _proofList,
         BigNumber memory _n,
         uint256 _proofSize
-    ) private view returns (bool) {
+    ) private view {
         BigNumber memory _two = BigNumbers.two();
-        for (uint256 i; i < _proofSize; i = unchecked_inc(i)) {
+        uint256 i;
+        for (; i < _proofSize; i = unchecked_inc(i)) {
             if (_proofList[i].T == ONE) {
-                return _proofList[i].y.eq(_proofList[i].x.modexp(_two, _n));
+                if (!_proofList[i].y.eq(_proofList[i].x.modexp(_two, _n)))
+                    revert NotVerifiedAtTOne();
+                if (i + ONE != _proofSize) revert TOneNotAtLast();
+                return;
             }
             BigNumber memory _y = _proofList[i].y;
             BigNumber memory _r = modHash(
@@ -233,11 +237,12 @@ contract CommitRevealRecoverRNG is ICommitRevealRecoverRNG {
             ).mod(BigNumber(MODFORHASH, MODFORHASH_LEN));
             if (_proofList[i].T & ONE == ONE) _y = _y.modexp(_two, _n);
             BigNumber memory _xPrime = _proofList[i].x.modexp(_r, _n).modmul(_proofList[i].v, _n);
-            if (!_xPrime.eq(_proofList[unchecked_inc(i)].x)) return false;
+            if (!_xPrime.eq(_proofList[unchecked_inc(i)].x)) revert XPrimeNotEqualAtIndex(i);
             BigNumber memory _yPrime = _proofList[i].v.modexp(_r, _n);
-            if (!_yPrime.modmul(_y, _n).eq(_proofList[unchecked_inc(i)].y)) return false;
+            if (!_yPrime.modmul(_y, _n).eq(_proofList[unchecked_inc(i)].y))
+                revert YPrimeNotEqualAtIndex(i);
         }
-        return true;
+        if (i != _proofSize) revert iNotMatchProofSize();
     }
 
     function unchecked_inc(uint256 i) private pure returns (uint) {
