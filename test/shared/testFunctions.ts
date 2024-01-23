@@ -23,6 +23,7 @@ import {
 import { testCases } from "./testcases"
 import { developmentChains, networkConfig } from "../../helper-hardhat-config"
 import fs from "fs"
+import { RandomAirdrop } from "../../typechain-types"
 
 export const getRankPointOfEachParticipants = async (
     randomAirdropContract: Contract,
@@ -35,13 +36,13 @@ export const getRankPointOfEachParticipants = async (
             await randomAirdropContract.getValuesAtRound(round).then((x) => x.omega.val),
         ),
     )
-    let valuesAtRound: any = await randomAirdropContract.getValuesAtRound(round)
-    for (let i = 0; i < valuesAtRound.numOfParticipants; i++) {
-        let commitRevealValues: any = await randomAirdropContract.getCommitRevealValues(round, i)
-        let address: string = commitRevealValues.participantAddress
-        addresses.push(address)
+    //let valuesAtRound: any = await randomAirdropContract.getValuesAtRound(round)
+    let participants: string[] = await randomAirdropContract.getParticipantsAtRound(round)
+    for (let i = 0; i < participants.length; i++) {
+        let address: string = participants[i]
         let b: bigint = BigInt(ethers.keccak256(address))
         let c: bigint = a - b
+        addresses.push(address)
         rankPoints.push(c < 0n ? -c : c)
     }
     return { addresses, rankPoints }
@@ -356,7 +357,8 @@ export const commit = async (
     signer: SignerWithAddress,
     params: CommitParams,
 ) => {
-    const tx = await (randomAirdropContract.connect(signer) as Contract).enterEventByCommit(
+    const tx = await (randomAirdropContract.connect(signer) as Contract).commit(
+        params.round,
         params.commit,
     )
     const receipt = await tx.wait()

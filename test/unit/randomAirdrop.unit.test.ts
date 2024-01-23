@@ -207,6 +207,13 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
               it("getRankofEachPariticipants result from contract should be equal to typescript function", async () => {
                   let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                   for (let round = 0; round < testcases.length; round++) {
+                      for (let i = 0; i < 10; i++) {
+                          //get signer
+                          let signer = signers[i]
+                          await (
+                              randomAirdropContract.connect(signer) as Contract
+                          ).registerNextRound()
+                      }
                       let params: SetUpParams = {
                           commitDuration,
                           commitRevealDuration,
@@ -249,6 +256,9 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                           randomAirdropContract,
                           round,
                       )
+                      console.log("typescriptRusult", typescriptRusult)
+                      console.log("randPointOfEachParticipants", randPointOfEachParticipants)
+
                       for (let i = 0; i < randPointOfEachParticipants[1].length; i++) {
                           assert.equal(
                               randPointOfEachParticipants[0][i],
