@@ -30,11 +30,13 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
 
     function startRegistration(uint256 _registrationDuration) external {
         if (_registrationDuration == 0) revert InvalidDuration();
-        if (isRegistrationStarted[nextRound]) revert RegistrationAlreadyStarted();
+        uint256 _nextRound = nextRound;
+        if (isRegistrationStarted[_nextRound] && participantsAtRound[_nextRound].length > 0)
+            revert RegistrationAlreadyStarted();
         startRegistrationTimeForNextRound = block.timestamp;
         registrationDurationForNextRound = _registrationDuration;
-        isRegistrationStarted[nextRound] = true;
-        emit StartRegistration(nextRound, block.timestamp);
+        isRegistrationStarted[_nextRound] = true;
+        emit StartRegistration(_nextRound, block.timestamp);
     }
 
     function registerForNextRound() external {
