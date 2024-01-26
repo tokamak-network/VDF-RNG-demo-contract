@@ -11,7 +11,7 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
         private registerIndexPlusOneAtRound;
     mapping(uint256 round => address[] participants) private participantsAtRound;
     mapping(uint256 round => bool) private isRegistrationStarted;
-    uint256 private randomAirdropRound;
+    uint256 public randomAirdropRound;
     uint256 private startRegistrationTimeForNextRound;
     uint256 private registrationDurationForNextRound;
 
