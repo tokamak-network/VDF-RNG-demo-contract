@@ -23,11 +23,13 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
     error RegistrationNotFinished();
     error RegistrationAlreadyStarted();
     error RegistrationFinished();
+    error InvalidDuration();
 
     event RandomAirdropRegisteredAtRound(address indexed _entrant, uint256 _timestamp);
     event Registered(address indexed _entrant, uint256 _timestamp);
 
     function startRegistration(uint256 _registrationDuration) external {
+        if (_registrationDuration == 0) revert InvalidDuration();
         if (isRegistrationStarted[nextRound]) revert RegistrationAlreadyStarted();
         startRegistrationTimeForNextRound = block.timestamp;
         registrationDurationForNextRound = _registrationDuration;
