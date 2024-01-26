@@ -21,6 +21,7 @@ import {
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers"
 import { time } from "@nomicfoundation/hardhat-network-helpers"
 import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/assertFunctions"
+import exp from "constants"
 //const { time } = require("@nomicfoundation/hardhat-network-helpers")}
 
 !developmentChains.includes(network.name)
@@ -49,10 +50,67 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                   }
               })
           })
+          let signers: SignerWithAddress[]
+          describe("registerForNextRound", () => {
+              it("registerForNextRound for every testcase should not pass, because registration didn't started", async () => {
+                  let { randomAirdropContract, receipt } = await deployRandomAirdrop()
+                  signers = await ethers.getSigners()
+                  for (let round = 0; round < testcases.length; round++) {
+                      for (let i = 0; i < 10; i++) {
+                          //get signer
+                          let signer = signers[i]
+                          await expect(
+                              (
+                                  randomAirdropContract.connect(signer) as Contract
+                              ).registerForNextRound(),
+                          ).to.be.revertedWithCustomError(
+                              randomAirdropContract,
+                              "RegistrationNotStarted()",
+                          )
+                      }
+                  }
+              })
+              it("registerForNextRound for every testcase should pass, because registration started", async () => {
+                  let { randomAirdropContract, receipt } = await deployRandomAirdrop()
+                  signers = await ethers.getSigners()
+                  for (let round = 0; round < testcases.length; round++) {
+                      let isRegistrationStarted =
+                          await randomAirdropContract.getIsRegistrationStarted(round)
+                      expect(isRegistrationStarted).to.be.equal(false)
+                      const tx = await randomAirdropContract.startRegistration(120)
+                      const receipt = await tx.wait()
+                      const registrationDurationForNextRound =
+                          await randomAirdropContract.getRegistrationDurationForNextRound()
+                      expect(registrationDurationForNextRound).to.be.equal(120)
+                      const startRegistrationTimeForNextRound =
+                          await randomAirdropContract.getStartRegistrationTimeForNextRound()
+                      isRegistrationStarted =
+                          await randomAirdropContract.getIsRegistrationStarted(round)
+                      expect(isRegistrationStarted).to.be.equal(true)
+                      expect(startRegistrationTimeForNextRound).to.be.equal(await time.latest())
+                      for (let i = 0; i < 10; i++) {
+                          //get signer
+                          let signer = signers[i]
+                          await (
+                              randomAirdropContract.connect(signer) as Contract
+                          ).registerForNextRound()
+                      }
+                  }
+              })
+          })
           describe("setUp", () => {
               it("setUp for every testcase should pass, multiple rounds", async () => {
                   for (let i = 0; i < testcases.length; i++) {
                       let { randomAirdropContract, receipt } = await deployRandomAirdrop()
+                      await randomAirdropContract.startRegistration(120)
+                      for (let i = 0; i < 10; i++) {
+                          //get signer
+                          let signer = signers[i]
+                          await (
+                              randomAirdropContract.connect(signer) as Contract
+                          ).registerForNextRound()
+                      }
+                      await time.increase(120)
                       let params: SetUpParams = {
                           commitDuration,
                           commitRevealDuration,
@@ -66,11 +124,19 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
                   }
               })
           })
-          let signers: SignerWithAddress[]
           describe("commit", () => {
               it("commit for every testcase should pass, multiple rounds", async () => {
                   let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                   for (let round = 0; round < testcases.length; round++) {
+                      await randomAirdropContract.startRegistration(120)
+                      for (let i = 0; i < 10; i++) {
+                          //get signer
+                          let signer = signers[i]
+                          await (
+                              randomAirdropContract.connect(signer) as Contract
+                          ).registerForNextRound()
+                      }
+                      await time.increase(120)
                       let params: SetUpParams = {
                           commitDuration,
                           commitRevealDuration,
@@ -96,6 +162,15 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
               it("reveal for every testcase should pass, multiple rounds", async () => {
                   let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                   for (let round = 0; round < testcases.length; round++) {
+                      await randomAirdropContract.startRegistration(120)
+                      for (let i = 0; i < 10; i++) {
+                          //get signer
+                          let signer = signers[i]
+                          await (
+                              randomAirdropContract.connect(signer) as Contract
+                          ).registerForNextRound()
+                      }
+                      await time.increase(120)
                       let params: SetUpParams = {
                           commitDuration,
                           commitRevealDuration,
@@ -129,6 +204,15 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
               it("All Revealed, Calculated Omega should be correct for every testcase, multiple rounds", async () => {
                   let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                   for (let round = 0; round < testcases.length; round++) {
+                      await randomAirdropContract.startRegistration(120)
+                      for (let i = 0; i < 10; i++) {
+                          //get signer
+                          let signer = signers[i]
+                          await (
+                              randomAirdropContract.connect(signer) as Contract
+                          ).registerForNextRound()
+                      }
+                      await time.increase(120)
                       let params: SetUpParams = {
                           commitDuration,
                           commitRevealDuration,
@@ -170,6 +254,15 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
               it("Recovered Omega should be correct for every testcase, multiple rounds", async () => {
                   let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                   for (let round = 0; round < testcases.length; round++) {
+                      await randomAirdropContract.startRegistration(120)
+                      for (let i = 0; i < 10; i++) {
+                          //get signer
+                          let signer = signers[i]
+                          await (
+                              randomAirdropContract.connect(signer) as Contract
+                          ).registerForNextRound()
+                      }
+                      await time.increase(120)
                       let params: SetUpParams = {
                           commitDuration,
                           commitRevealDuration,
@@ -207,13 +300,16 @@ import { assertTestAfterDeploy, assertTestAfterGettingOmega } from "../shared/as
               it("getRankofEachPariticipants result from contract should be equal to typescript function", async () => {
                   let { randomAirdropContract, receipt } = await deployRandomAirdrop()
                   for (let round = 0; round < testcases.length; round++) {
+                      await randomAirdropContract.startRegistration(120)
                       for (let i = 0; i < 10; i++) {
                           //get signer
                           let signer = signers[i]
                           await (
                               randomAirdropContract.connect(signer) as Contract
-                          ).registerNextRound()
+                          ).registerForNextRound()
                       }
+                      await time.increase(120)
+
                       let params: SetUpParams = {
                           commitDuration,
                           commitRevealDuration,
