@@ -5,17 +5,53 @@ import "./CommitRevealRecoverRNG/CommitRevealRecoverRNG.sol";
 
 contract RandomAirdrop is CommitRevealRecoverRNG {
     using BigNumbers for *;
+
     mapping(address participantAddress => uint256[] rounds) private participatedRounds;
     mapping(address participantAddress => mapping(uint256 round => uint256 registerIndex))
         private registerIndexPlusOneAtRound;
     mapping(uint256 round => address[] participants) private participantsAtRound;
-    uint256 public randomAirdropRound;
+    mapping(uint256 round => bool) private isRegistrationStarted;
+    uint256 private randomAirdropRound;
+    uint256 private startRegistrationTimeForNextRound;
+    uint256 private registrationDurationForNextRound;
+
+    event StartRegistration(uint256 _round, uint256 _timestamp);
 
     error RoundNotCompleted();
     error AlreadyRegistered();
+    error RegistrationNotStarted();
+    error RegistrationNotFinished();
+    error RegistrationAlreadyStarted();
+    error RegistrationFinished();
 
     event RandomAirdropRegisteredAtRound(address indexed _entrant, uint256 _timestamp);
     event Registered(address indexed _entrant, uint256 _timestamp);
+
+    function startRegistration(uint256 _registrationDuration) external {
+        if (isRegistrationStarted[nextRound]) revert RegistrationAlreadyStarted();
+        startRegistrationTimeForNextRound = block.timestamp;
+        registrationDurationForNextRound = _registrationDuration;
+        isRegistrationStarted[nextRound] = true;
+        emit StartRegistration(nextRound, block.timestamp);
+    }
+
+    function registerForNextRound() external {
+        if (!isRegistrationStarted[nextRound]) {
+            revert RegistrationNotStarted();
+        }
+        if (
+            block.timestamp > startRegistrationTimeForNextRound + registrationDurationForNextRound
+        ) {
+            revert RegistrationFinished();
+        }
+
+        uint256 _round = nextRound;
+        if (registerIndexPlusOneAtRound[msg.sender][_round] != 0) revert AlreadyRegistered();
+        registerIndexPlusOneAtRound[msg.sender][_round] = participantsAtRound[_round].length + 1;
+        participantsAtRound[_round].push(msg.sender);
+        participatedRounds[msg.sender].push(_round);
+        emit Registered(msg.sender, block.timestamp);
+    }
 
     function setUp(
         uint256 _commitDuration,
@@ -23,20 +59,18 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
         BigNumber calldata _n,
         VDFClaim[] calldata _proofs
     ) external override returns (uint256) {
+        if (!isRegistrationStarted[nextRound]) revert RegistrationNotStarted();
+        if (
+            block.timestamp <= startRegistrationTimeForNextRound + registrationDurationForNextRound
+        ) {
+            revert RegistrationNotFinished();
+        }
+
         checkStage(randomAirdropRound);
         if (valuesAtRound[randomAirdropRound].stage != Stages.Finished) revert StageNotFinished();
         uint256 _round = _setUp(_commitDuration, _commitRevealDuration, _n, _proofs);
         randomAirdropRound = _round;
         return _round;
-    }
-
-    function registerNextRound() external {
-        uint256 _round = nextRound;
-        if (registerIndexPlusOneAtRound[msg.sender][_round] != 0) revert AlreadyRegistered();
-        registerIndexPlusOneAtRound[msg.sender][_round] = participantsAtRound[_round].length + 1;
-        participantsAtRound[_round].push(msg.sender);
-        participatedRounds[msg.sender].push(_round);
-        emit Registered(msg.sender, block.timestamp);
     }
 
     function getRankPointOfEachParticipants(
@@ -65,5 +99,17 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
 
     function getParticipantsLengthAtRound(uint256 _round) external view returns (uint256) {
         return participantsAtRound[_round].length;
+    }
+
+    function getStartRegistrationTimeForNextRound() external view returns (uint256) {
+        return startRegistrationTimeForNextRound;
+    }
+
+    function getRegistrationDurationForNextRound() external view returns (uint256) {
+        return registrationDurationForNextRound;
+    }
+
+    function getIsRegistrationStarted(uint256 _round) external view returns (bool) {
+        return isRegistrationStarted[_round];
     }
 }
