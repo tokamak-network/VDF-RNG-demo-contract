@@ -20,7 +20,7 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
     error RoundNotCompleted();
     error AlreadyRegistered();
     error RegistrationNotStarted();
-    error RegistrationNotFinished();
+    error RegistrationInProgress();
     error RegistrationAlreadyStarted();
     error RegistrationFinished();
     error InvalidDuration();
@@ -31,8 +31,15 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
     function startRegistration(uint256 _registrationDuration) external {
         if (_registrationDuration == 0) revert InvalidDuration();
         uint256 _nextRound = nextRound;
-        if (isRegistrationStarted[_nextRound] && participantsAtRound[_nextRound].length > 0)
-            revert RegistrationAlreadyStarted();
+        if (isRegistrationStarted[_nextRound]) {
+            if (participantsAtRound[_nextRound].length > 0) revert RegistrationAlreadyStarted();
+            if (
+                block.timestamp <=
+                startRegistrationTimeForNextRound + registrationDurationForNextRound
+            ) {
+                revert RegistrationInProgress();
+            }
+        }
         startRegistrationTimeForNextRound = block.timestamp;
         registrationDurationForNextRound = _registrationDuration;
         isRegistrationStarted[_nextRound] = true;
@@ -67,7 +74,7 @@ contract RandomAirdrop is CommitRevealRecoverRNG {
         if (
             block.timestamp <= startRegistrationTimeForNextRound + registrationDurationForNextRound
         ) {
-            revert RegistrationNotFinished();
+            revert RegistrationInProgress();
         }
 
         checkStage(randomAirdropRound);
